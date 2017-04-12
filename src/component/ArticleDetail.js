@@ -183,8 +183,8 @@ export default class ArticleDetail extends Component {
             </Col>
             <Col span={22}>
               <ul>
-                {events.map((item, i) => {
-                  return <li key={`event_${i}`}>{i + 1}. {item.text}</li>;
+                {events.edges.map((item, i) => {
+                  return <li key={`event_${i}`}>{i + 1}. {item.node.text}</li>;
                 })}
               </ul>
 
@@ -215,13 +215,13 @@ export default class ArticleDetail extends Component {
                 className="articleDetial"
                 pending={<a href="#">更多</a>}
               >
-                {notes.map((note, i) => (
+                {notes.edges.map((note, i) => (
                   <Timeline.Item
-                    key={`note_${i}`}
+                    key={note.node.id}
                     dot={
                       <span>
                         <span style={{ paddingRight: 7 }}>
-                          {moment(note.createdAt).fromNow()}
+                          {moment(note.node.createdAt).fromNow()}
                         </span>
                         <Icon
                           type="clock-circle-o"
@@ -230,7 +230,7 @@ export default class ArticleDetail extends Component {
                       </span>
                     }
                   >
-                    {note.text}
+                    {note.node.text}
                   </Timeline.Item>
                 ))}
               </Timeline>
@@ -293,13 +293,23 @@ export const DetailContainer = Relay.createContainer(ArticleDetail, {
           marriage,
           children,
           events {
-            text,
-            createdAt,
+            edges {
+              node {
+                id,
+                text,
+                createdAt,
+              }
+            }
           },
           knowledge,
           notes {
-            text,
-            createdAt,
+            edges {
+              node {
+                id,
+                text,
+                createdAt,
+              }
+            }
           },
           createdAt
         }

@@ -1,8 +1,7 @@
 // @flow
 import React from "react";
-import { Form, Select } from "antd";
+import { Form, AutoComplete } from "antd";
 const FormItem = Form.Item;
-const Option = Select.Option;
 
 const emptyRoles = [];
 function getRole(message) {
@@ -15,7 +14,6 @@ module.exports = (props: any) => {
     getFieldDecorator,
     label,
     fieldName,
-    showSearch = true,
     placeholder,
     edges,
     message,
@@ -26,13 +24,10 @@ module.exports = (props: any) => {
       {getFieldDecorator(fieldName, {
         rules: required ? getRole(message) : emptyRoles
       })(
-        <Select showSearch={showSearch} placeholder={placeholder}>
-          {edges.map(edge => (
-            <Option key={edge.node.id} value={edge.node.name}>
-              {edge.node.name}
-            </Option>
-          ))}
-        </Select>
+        <AutoComplete
+          dataSource={edges.map(edge => edge.node.name)}
+          placeholder={placeholder}
+        />
       )}
     </FormItem>
   );

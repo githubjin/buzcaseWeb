@@ -162,7 +162,7 @@ class ArticleItem extends PureComponent {
             <Col span={19} style={styles.content}>
               <div onClick={this.viewDetails}>
                 <span style={styles.bold}>重要事件：</span>
-                {_.truncate(events[0].text, { length: 200 })}
+                {_.truncate(events.edges[0].node.text, { length: 200 })}
               </div>
               <div>
                 <div>

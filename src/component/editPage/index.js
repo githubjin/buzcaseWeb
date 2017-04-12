@@ -27,6 +27,7 @@ class AritcleEditor extends PureComponent {
           <RelayLoading route={new NodeQueryConfig({ id })}>
             <EditForm
               master={this.props.master}
+              outRelay={this.props.relay}
               onValuesChange={this.onValuesChange.bind(this)}
             />
           </RelayLoading>
@@ -36,33 +37,11 @@ class AritcleEditor extends PureComponent {
   }
 }
 
-var EditorContainer = Relay.createContainer(AritcleEditor, {
+export var EditorContainer = Relay.createContainer(AritcleEditor, {
   initialVariables: { provinceCode: "0", cityCode: "0" },
   fragments: {
     master: () => Relay.QL`
       fragment on MasterType {
-        provinces(first: 50) {
-          edges {
-            node {
-              id,
-              name,
-              isLeaf,
-              code
-            }
-          }
-        },
-        cities: subQuyu(code: $provinceCode) {
-          id,
-          name,
-          code,
-          isLeaf
-        },
-        areas: subQuyu(code: $cityCode) {
-          id,
-          name,
-          code,
-          isLeaf
-        },
         jobs:dic(code: "Job", first: 99999) {
           edges {
             node {
@@ -113,7 +92,7 @@ var EditorContainer = Relay.createContainer(AritcleEditor, {
   }
 });
 
-module.exports = (props: any) => (
+export default (props: any) => (
   <RelayLoading route={new QueryRoute()}>
     <EditorContainer {...props} />
   </RelayLoading>

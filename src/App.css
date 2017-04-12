@@ -188,6 +188,9 @@ a.toggle-expand, .summary-tail-button {
 #filter_homeplace .ant-cascader-picker-label {
   font-size: 14px;
 }
+#articleEditorForm .ant-cascader-picker-label {
+  font-size: 14px;
+}
 
 /* For demo */
 /*.ant-carousel .slick-slide {

@@ -6,43 +6,12 @@ import Relay from "react-relay";
 import { DetailContainer } from "../ArticleDetail";
 
 import InputItem from "./fields/InputItem";
-import SelectItem from "./fields/SelectItem";
+import AutoCompleteItem from "./fields/AutoCompleteItem";
 import Birthtime from "./fields/Birthtime";
-
-const residences = [
-  {
-    value: "zhejiang",
-    label: "Zhejiang",
-    children: [
-      {
-        value: "hangzhou",
-        label: "Hangzhou",
-        children: [
-          {
-            value: "xihu",
-            label: "West Lake"
-          }
-        ]
-      }
-    ]
-  },
-  {
-    value: "jiangsu",
-    label: "Jiangsu",
-    children: [
-      {
-        value: "nanjing",
-        label: "Nanjing",
-        children: [
-          {
-            value: "zhonghuamen",
-            label: "Zhong Hua Men"
-          }
-        ]
-      }
-    ]
-  }
-];
+import Textarea from "./fields/Textarea";
+import BirthPlace from "./fields/BirthPlace";
+import RelayLoading from "../RelayLoading";
+import QueryRoute from "../../queryConfig";
 
 class EditForm extends React.Component {
   props: {
@@ -159,6 +128,7 @@ class EditForm extends React.Component {
     });
     return (
       <Form
+        id="articleEditorForm"
         onSubmit={this.handleSubmit}
         style={{
           borderTop: "1px dashed #e9e9e9",
@@ -175,7 +145,7 @@ class EditForm extends React.Component {
           formItemLayout={formItemLayout}
           getFieldDecorator={getFieldDecorator}
         />
-        <SelectItem
+        <AutoCompleteItem
           formItemLayout={formItemLayout}
           getFieldDecorator={getFieldDecorator}
           label="类别"
@@ -194,7 +164,7 @@ class EditForm extends React.Component {
           formItemLayout={formItemLayout}
           getFieldDecorator={getFieldDecorator}
         />
-        <SelectItem
+        <AutoCompleteItem
           formItemLayout={formItemLayout}
           getFieldDecorator={getFieldDecorator}
           label="性别"
@@ -213,14 +183,18 @@ class EditForm extends React.Component {
           message="出生时间不能为空"
           required={true}
         />
-        <FormItem hasFeedback {...formItemLayout} label="出生地点">
-          {getFieldDecorator("homeplace", {
-            initialValue: ["zhejiang", "hangzhou", "xihu"],
-            rules: [{ type: "array", required: true, message: "出生地点不能为空" }]
-          })(<Cascader options={residences} />)}
-        </FormItem>
-
-        <SelectItem
+        <RelayLoading route={new QueryRoute()}>
+          <BirthPlace
+            formItemLayout={formItemLayout}
+            getFieldDecorator={getFieldDecorator}
+            label="出生地点"
+            fieldName="homeplace"
+            placeholder="出生地点"
+            message="出生地点不能为空"
+            required={true}
+          />
+        </RelayLoading>
+        <AutoCompleteItem
           formItemLayout={formItemLayout}
           getFieldDecorator={getFieldDecorator}
           label="学历"
@@ -230,8 +204,7 @@ class EditForm extends React.Component {
           placeholder="请选择案例人物学历"
           edges={master.educations.edges}
         />
-
-        <SelectItem
+        <AutoCompleteItem
           formItemLayout={formItemLayout}
           getFieldDecorator={getFieldDecorator}
           label="职业"
@@ -241,8 +214,7 @@ class EditForm extends React.Component {
           placeholder="请选择案例人物职业"
           edges={master.jobs.edges}
         />
-
-        <SelectItem
+        <AutoCompleteItem
           formItemLayout={formItemLayout}
           getFieldDecorator={getFieldDecorator}
           label="婚姻"
@@ -252,35 +224,28 @@ class EditForm extends React.Component {
           placeholder="请选择案例人物职业"
           edges={master.marriages.edges}
         />
-
-        <FormItem hasFeedback {...formItemLayout} label="子女">
-          {getFieldDecorator("children")(
-            <Input
-              type="textarea"
-              placeholder="子女信息(可以不填)"
-              autosize={{ minRows: 2, maxRows: 10 }}
-            />
-          )}
-        </FormItem>
-
+        <Textarea
+          label="子女"
+          placeholder="子女信息(可以不填)"
+          fieldName="children"
+          autosize={{ minRows: 2, maxRows: 10 }}
+          getFieldDecorator={getFieldDecorator}
+          formItemLayout={formItemLayout}
+        />
         {formItems}
-
         <FormItem {...formItemLayoutWithOutLabel}>
           <Button type="dashed" onClick={this.add} style={{ width: "100%" }}>
             <Icon type="plus" /> 添加重要事件
           </Button>
         </FormItem>
-
-        <FormItem hasFeedback {...formItemLayout} label="命理知识备注">
-          {getFieldDecorator("notes")(
-            <Input
-              type="textarea"
-              placeholder="请填写命理知识备注(可以不填)"
-              autosize={{ minRows: 2, maxRows: 20 }}
-            />
-          )}
-        </FormItem>
-
+        <Textarea
+          label="命理知识备注"
+          placeholder="请填写命理知识备注(可以不填)"
+          fieldName="notes"
+          autosize={{ minRows: 2, maxRows: 20 }}
+          getFieldDecorator={getFieldDecorator}
+          formItemLayout={formItemLayout}
+        />
         <FormItem {...formItemLayoutWithOutLabel}>
           <Button style={{ width: "100%" }} type="primary" htmlType="submit">
             保存
@@ -290,8 +255,6 @@ class EditForm extends React.Component {
     );
   }
 }
-
-// const WrappedEditForm = Form.create()(EditForm);
 
 class WrappedEditForm extends React.PureComponent {
   props: {

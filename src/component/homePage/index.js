@@ -116,13 +116,23 @@ const Container = Relay.createContainer(HomePage, {
               marriage,
               children,
               events {
-                text,
-                createdAt,
+                edges {
+                  node {
+                    id,
+                    text,
+                    createdAt,
+                  }
+                }
               },
               knowledge,
               notes {
-                text,
-                createdAt,
+                edges {
+                  node {
+                    id,
+                    text,
+                    createdAt,
+                  }
+                }
               },
               createdAt
             }
