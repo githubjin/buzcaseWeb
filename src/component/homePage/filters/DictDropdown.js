@@ -1,9 +1,6 @@
 // @flow
 import React, { PureComponent, PropTypes } from "react";
 import { Button, Menu, Dropdown, Icon } from "antd";
-import Relay from "react-relay";
-
-import DicPoolRoute from "../../queryConfig";
 
 export default class DictDropdown extends PureComponent {
   handleMenuClick: (e: Object) => void;

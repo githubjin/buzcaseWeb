@@ -33,18 +33,9 @@ class App extends PureComponent {
                   style={{ background: "#fff" }}
                 >
                   <div className="App-content">
-                    <PrivateRoute
-                      exact
-                      path="/"
-                      master={this.props.master}
-                      component={HomePage}
-                    />
+                    <PrivateRoute exact path="/" component={HomePage} />
                     <PrivateRoute path="/edit/:id" component={AddPage} />
-                    <PrivateRoute
-                      path="/feedback"
-                      master={this.props.master}
-                      component={Feedback}
-                    />
+                    <PrivateRoute path="/feedback" component={Feedback} />
                     <PrivateRoute path="/detail/:id" component={DetailPage} />
                   </div>
                 </Content>
@@ -73,8 +64,6 @@ module.exports = Relay.createContainer(App, {
       fragment on MasterType {
         ${Masterinfo.getFragment("master")}
         ${SignPage.getFragment("master")}
-        ${HomePage.getFragment("master")}
-        ${Feedback.getFragment("master")}
       }
     `
   }

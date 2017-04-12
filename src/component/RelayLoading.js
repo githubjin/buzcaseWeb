@@ -12,7 +12,7 @@ export default class RelayLoading extends Component {
   }
   render() {
     const child = React.Children.only(this.props.children);
-    const { route } = this.props;
+    const { route, loadingElement = Spin } = this.props;
     const routeConfig = route;
     return (
       <Relay.Renderer
@@ -21,11 +21,11 @@ export default class RelayLoading extends Component {
         environment={Relay.Store}
         render={({ done, error, props, retry, stale }) => {
           if (error) {
-            return <h1>${error}</h1>;
+            return <h1>${error}<a onClick={retry}>重新加载</a></h1>;
           } else if (props) {
             return this.renderChild(child, props);
           } else {
-            return <Spin />;
+            return <div>{React.createElement(loadingElement)}</div>;
           }
         }}
       />
@@ -34,5 +34,6 @@ export default class RelayLoading extends Component {
 }
 
 RelayLoading.propTypes = {
-  route: PropTypes.object.isRequired
+  route: PropTypes.object.isRequired,
+  loadingElement: PropTypes.func
 };

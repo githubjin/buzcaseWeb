@@ -52,7 +52,7 @@ class BirthPlace extends React.PureComponent {
       targetOption.loading = true;
       delete targetOption.children;
     }
-    // this.loadData(selectedOptions);
+    this.loadData(selectedOptions);
   }
   onChange(value, selectedOptions) {
     this.clearSubQuyu(value, selectedOptions);

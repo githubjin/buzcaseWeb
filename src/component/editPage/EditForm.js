@@ -1,9 +1,13 @@
 import React from "react";
-import { Form, Select, Cascader, Button, Icon, Input, DatePicker } from "antd";
+import { Form, Cascader, Button, Icon, Input } from "antd";
 const FormItem = Form.Item;
-const Option = Select.Option;
 import Relay from "react-relay";
-import ArticleDetail from "../ArticleDetail";
+
+import { DetailContainer } from "../ArticleDetail";
+
+import InputItem from "./fields/InputItem";
+import SelectItem from "./fields/SelectItem";
+import Birthtime from "./fields/Birthtime";
 
 const residences = [
   {
@@ -41,6 +45,9 @@ const residences = [
 ];
 
 class EditForm extends React.Component {
+  props: {
+    master: Object
+  };
   constructor(props) {
     super(props);
     this.uuid = 0;
@@ -92,6 +99,8 @@ class EditForm extends React.Component {
     });
   }
   render() {
+    const { master, node } = this.props;
+    console.log(master, node);
     const { getFieldDecorator, getFieldValue } = this.props.form;
     const formItemLayout = {
       labelCol: {
@@ -157,52 +166,53 @@ class EditForm extends React.Component {
           marginTop: 10
         }}
       >
-        <FormItem hasFeedback {...formItemLayout} label="标题">
-          {getFieldDecorator("title", {
-            rules: [{ required: true, message: "案例标题不能为空" }]
-          })(<Input placeholder="请输入案例标题" />)}
-        </FormItem>
-
-        <FormItem {...formItemLayout} label="类别" hasFeedback>
-          {getFieldDecorator("tags")(
-            <Select showSearch={true} placeholder="请选择案例类别">
-              <Option value="全部">全部</Option>
-              <Option value="高官">高官</Option>
-              <Option value="牢狱">牢狱</Option>
-              <Option value="晚婚">晚婚</Option>
-            </Select>
-          )}
-        </FormItem>
-
-        <FormItem hasFeedback {...formItemLayout} label="姓名/昵称">
-          {getFieldDecorator("name", {
-            rules: [{ required: true, message: "姓名/昵称不能为空" }]
-          })(<Input placeholder="请输入案例人物姓名/昵称" />)}
-        </FormItem>
-        <FormItem {...formItemLayout} label="性别" hasFeedback>
-          {getFieldDecorator("gender", {
-            rules: [{ required: true, message: "性别不能为空" }]
-          })(
-            <Select placeholder="请选择案例人物性别">
-              <Option value="1">全部</Option>
-              <Option value="2">男</Option>
-              <Option value="3">女</Option>
-              <Option value="4">其他</Option>
-            </Select>
-          )}
-        </FormItem>
-        <FormItem hasFeedback {...formItemLayout} label="出生时间">
-          {getFieldDecorator("birthday", {
-            rules: [{ required: true, message: "出生时间不能为空" }]
-          })(
-            <DatePicker
-              format="YYYY-MM-DD HH:mm"
-              showTime={true}
-              style={{ width: "100%" }}
-            />
-          )}
-        </FormItem>
-
+        <InputItem
+          label="标题"
+          message="案例标题不能为空"
+          placeholder="请输入案例标题"
+          required={true}
+          fieldName="title"
+          formItemLayout={formItemLayout}
+          getFieldDecorator={getFieldDecorator}
+        />
+        <SelectItem
+          formItemLayout={formItemLayout}
+          getFieldDecorator={getFieldDecorator}
+          label="类别"
+          fieldName="category"
+          showSearch={true}
+          placeholder="请选择案例类别"
+          message="案例类别不能为空"
+          edges={master.categories.edges}
+        />
+        <InputItem
+          label="姓名/昵称"
+          message="姓名/昵称不能为空"
+          placeholder="请输入案例人物姓名/昵称"
+          required={true}
+          fieldName="name"
+          formItemLayout={formItemLayout}
+          getFieldDecorator={getFieldDecorator}
+        />
+        <SelectItem
+          formItemLayout={formItemLayout}
+          getFieldDecorator={getFieldDecorator}
+          label="性别"
+          fieldName="gender"
+          showSearch={true}
+          message="性别不能为空"
+          placeholder="请选择案例人物性别"
+          edges={master.genders.edges}
+        />
+        <Birthtime
+          formItemLayout={formItemLayout}
+          getFieldDecorator={getFieldDecorator}
+          label="出生时间"
+          fieldName="birthday"
+          placeholder="出生时间"
+          message="出生时间不能为空"
+          required={true}
+        />
         <FormItem hasFeedback {...formItemLayout} label="出生地点">
           {getFieldDecorator("homeplace", {
             initialValue: ["zhejiang", "hangzhou", "xihu"],
@@ -210,42 +220,38 @@ class EditForm extends React.Component {
           })(<Cascader options={residences} />)}
         </FormItem>
 
-        <FormItem {...formItemLayout} label="学历" hasFeedback>
-          {getFieldDecorator("education")(
-            <Select showSearch={true} placeholder="请选择案例人物学历">
-              <Option value="全部">全部</Option>
-              <Option value="小学">小学</Option>
-              <Option value="初中">初中</Option>
-              <Option value="高中">高中</Option>
-              <Option value="中专">中专</Option>
-              <Option value="大学">大学</Option>
-            </Select>
-          )}
-        </FormItem>
+        <SelectItem
+          formItemLayout={formItemLayout}
+          getFieldDecorator={getFieldDecorator}
+          label="学历"
+          fieldName="education"
+          showSearch={true}
+          message="学历不能为空"
+          placeholder="请选择案例人物学历"
+          edges={master.educations.edges}
+        />
 
-        <FormItem {...formItemLayout} label="职业" hasFeedback>
-          {getFieldDecorator("job")(
-            <Select showSearch={true} placeholder="请选择案例人物职业">
-              <Option value="全部">全部</Option>
-              <Option value="导演">导演</Option>
-              <Option value="演员">演员</Option>
-              <Option value="专业游戏玩家">专业游戏玩家</Option>
-              <Option value="自由职业">自由职业</Option>
-              <Option value="CEO">CEO</Option>
-            </Select>
-          )}
-        </FormItem>
+        <SelectItem
+          formItemLayout={formItemLayout}
+          getFieldDecorator={getFieldDecorator}
+          label="职业"
+          fieldName="job"
+          showSearch={true}
+          message="人物职业不能为空"
+          placeholder="请选择案例人物职业"
+          edges={master.jobs.edges}
+        />
 
-        <FormItem {...formItemLayout} label="婚姻" hasFeedback>
-          {getFieldDecorator("marriage")(
-            <Select showSearch={true} placeholder="请选择案例人物职业">
-              <Option value="全部">全部</Option>
-              <Option value="已婚">已婚</Option>
-              <Option value="离婚">离婚</Option>
-              <Option value="未婚">未婚</Option>
-            </Select>
-          )}
-        </FormItem>
+        <SelectItem
+          formItemLayout={formItemLayout}
+          getFieldDecorator={getFieldDecorator}
+          label="婚姻"
+          fieldName="marriage"
+          showSearch={true}
+          message="人物婚姻状况不能为空"
+          placeholder="请选择案例人物职业"
+          edges={master.marriages.edges}
+        />
 
         <FormItem hasFeedback {...formItemLayout} label="子女">
           {getFieldDecorator("children")(
@@ -305,80 +311,11 @@ class WrappedEditForm extends React.PureComponent {
   }
 }
 
-var ArticleEditorContainer = Relay.createContainer(WrappedEditForm, {
+module.exports = Relay.createContainer(WrappedEditForm, {
   fragments: {
-    article: () => Relay.QL`
-      fragment on Article {
-        ${ArticleDetail.getFragment("node")}
-      }
-    `,
-    provinces: () => Relay.QL`
-      fragment on JobConnection {
-        edges {
-          node {
-            id,
-            name,
-            order
-          }
-        }
-      }
-    `,
-    categories: () => Relay.QL`
-      fragment on JobConnection {
-        edges {
-          node {
-            id,
-            name,
-            order
-          }
-        }
-      }
-    `,
-    educations: () => Relay.QL`
-      fragment on JobConnection {
-        edges {
-          node {
-            id,
-            name,
-            order
-          }
-        }
-      }
-    `,
-    jobs: () => Relay.QL`
-      fragment on JobConnection {
-        edges {
-          node {
-            id,
-            name,
-            order
-          }
-        }
-      }
-    `,
-    genders: () => Relay.QL`
-      fragment on JobConnection {
-        edges {
-          node {
-            id,
-            name,
-            order
-          }
-        }
-      }
-    `,
-    marriages: () => Relay.QL`
-      fragment on JobConnection {
-        edges {
-          node {
-            id,
-            name,
-            order
-          }
-        }
-      }
-    `
+    node: () => Relay.QL`
+        fragment on Article {
+          ${DetailContainer.getFragment("node")}
+        }`
   }
 });
-
-export default WrappedEditForm;

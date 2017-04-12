@@ -18,6 +18,8 @@ import moment from "moment";
 
 import SectionTitle from "../SectionTitle";
 import AddFeedbackMutation from "./FeedbackMutation";
+import DicPoolRoute from "../../queryConfig";
+import RelayLoading from "../RelayLoading";
 
 const columns = [
   {
@@ -190,7 +192,7 @@ class Feedback extends Component {
   }
 }
 
-module.exports = Relay.createContainer(Form.create()(Feedback), {
+const Container = Relay.createContainer(Form.create()(Feedback), {
   initialVariables: {
     page: 1,
     pageSize: 10,
@@ -221,3 +223,9 @@ module.exports = Relay.createContainer(Form.create()(Feedback), {
     `
   }
 });
+
+module.exports = (props: any) => (
+  <RelayLoading route={new DicPoolRoute()}>
+    <Container {...props} />
+  </RelayLoading>
+);

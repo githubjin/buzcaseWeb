@@ -1,13 +1,14 @@
 // @flow
 import React, { PureComponent, PropTypes } from "react";
 import { DatePicker, Input } from "antd";
+import Relay from "react-relay";
 const InputGroup = Input.Group;
 import moment from "moment";
 
 import Marriage from "../filters/Marriage";
 import Gender from "../filters/Gender";
 
-export default class MoreFilter extends PureComponent {
+class MoreFilter extends PureComponent {
   onDateChangeHandler: (fieldName: string) => (
     date: any,
     dateString: string
@@ -71,3 +72,14 @@ export default class MoreFilter extends PureComponent {
 MoreFilter.propTypes = {
   doSearch: PropTypes.func.isRequired
 };
+
+module.exports = Relay.createContainer(MoreFilter, {
+  fragments: {
+    master: () => Relay.QL`
+      fragment on MasterType {
+        ${Gender.getFragment("master")}
+        ${Marriage.getFragment("master")}
+      }
+    `
+  }
+});

@@ -9,9 +9,6 @@ import moment from "moment";
 
 import type { ArticleProps } from "./types";
 
-import RelayLoading from "./RelayLoading";
-import NodeQueryConfig from "../queryConfig/NodeQueryConfig";
-
 const styles = {
   imgWrap: {
     padding: 5,
@@ -275,10 +272,9 @@ ArticleDetail.propTypes = {
   affixHandler: PropTypes.func
 };
 
-function getContainer() {
-  return Relay.createContainer(ArticleDetail, {
-    fragments: {
-      node: () => Relay.QL`
+export const DetailContainer = Relay.createContainer(ArticleDetail, {
+  fragments: {
+    node: () => Relay.QL`
         fragment on Article {
           id,
           attachments,
@@ -308,15 +304,5 @@ function getContainer() {
           createdAt
         }
       `
-    }
-  });
-}
-
-export const ArticleDetailContainer = (props: Object) => {
-  var Container = getContainer();
-  return (
-    <RelayLoading route={new NodeQueryConfig({ id: props.id })}>
-      <Container {...props} />
-    </RelayLoading>
-  );
-};
+  }
+});

@@ -3,15 +3,17 @@
 import React from "react";
 import Relay from "react-relay";
 import _ from "lodash";
+import styled from "styled-components";
 import FilterBox from "./FilterBox";
 import FilteredList from "./FilteredList";
-import CategoryFilter from "../filters/Category";
-import EducationFilter from "../filters/Education";
-import JobFilter from "../filters/Job";
-import BirthPlace from "../filters/BirthPlace";
-import Marriage from "../filters/Marriage";
-import Gender from "../filters/Gender";
+import { Row, Col, Icon } from "antd";
+import DicPoolRoute from "../../queryConfig";
+import RelayLoading from "../RelayLoading";
 
+const FilterBoxLoading = styled.div`
+  width: 960px;
+  height: 416px;
+`;
 class HomePage extends React.Component {
   goPage: (page: number, pageSize: number) => void;
   state: {
@@ -52,21 +54,33 @@ class HomePage extends React.Component {
     // console.log(articles);
     return (
       <div>
-        <FilterBox
-          master={this.props.master}
-          doSearch={this.doSearch.bind(this)}
-        />
-        <FilteredList
-          master={this.props.master}
-          goPage={this.goPage.bind(this)}
-          articles={articles}
-        />
+        <Row>
+          <Col span={24}>
+            <span className="App-content-title">
+              <Icon type="filter" style={{ marginRight: 5 }} />查询条件
+            </span>
+          </Col>
+        </Row>
+        <RelayLoading
+          route={new DicPoolRoute()}
+          loadingElement={FilterBoxLoading}
+        >
+          <FilterBox doSearch={this.doSearch.bind(this)} />
+        </RelayLoading>
+        <Row>
+          <Col span={24}>
+            <span className="App-content-title">
+              <Icon type="database" style={{ marginRight: 5 }} />案例列表
+            </span>
+          </Col>
+        </Row>
+        <FilteredList goPage={this.goPage.bind(this)} articles={articles} />
       </div>
     );
   }
 }
 
-module.exports = Relay.createContainer(HomePage, {
+const Container = Relay.createContainer(HomePage, {
   initialVariables: {
     page: 1,
     pageSize: 10,
@@ -76,12 +90,6 @@ module.exports = Relay.createContainer(HomePage, {
   fragments: {
     master: () => Relay.QL`
       fragment on MasterType {
-        ${EducationFilter.getFragment("master")}
-        ${CategoryFilter.getFragment("master")}
-        ${JobFilter.getFragment("master")}
-        ${BirthPlace.getFragment("master")}
-        ${Gender.getFragment("master")}
-        ${Marriage.getFragment("master")}
         articles(page: $page, pageSize: $pageSize, sorters: $sorters, first: $pageSize, conditions: $conditions){
           totalInfo {
             total,
@@ -124,3 +132,9 @@ module.exports = Relay.createContainer(HomePage, {
     `
   }
 });
+
+module.exports = (props: any) => (
+  <RelayLoading route={new DicPoolRoute()}>
+    <Container {...props} />
+  </RelayLoading>
+);

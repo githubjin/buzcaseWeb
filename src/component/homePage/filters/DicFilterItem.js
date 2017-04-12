@@ -1,7 +1,6 @@
 // @flow
 
 import React, { PureComponent, PropTypes } from "react";
-import Relay from "react-relay";
 import { Row, Col } from "antd";
 import _ from "lodash";
 
@@ -91,8 +90,8 @@ export default class DicFilterItem extends PureComponent {
     }
   }
   render() {
-    const { master: { dic: dict }, title, dicCode } = this.props;
-    console.log("--------------------------", title, dicCode, dict);
+    const { master: { dic: dict }, title } = this.props;
+    // console.log("--------------------------", this.props);
     return (
       <Row>
         <Col span={2}>
@@ -114,7 +113,6 @@ export default class DicFilterItem extends PureComponent {
 
 DicFilterItem.propTypes = {
   title: PropTypes.string.isRequired,
-  dicCode: PropTypes.string.isRequired,
   multiselect: PropTypes.bool,
   fieldName: PropTypes.string.isRequired
 };

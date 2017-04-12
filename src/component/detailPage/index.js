@@ -5,7 +5,10 @@ import { Button, Icon, Form, Input } from "antd";
 import { withRouter } from "react-router-dom";
 const FormItem = Form.Item;
 import SectionTitle from "../SectionTitle";
-import { ArticleDetailContainer } from "../ArticleDetail";
+
+import RelayLoading from "../RelayLoading";
+import NodeQueryConfig from "../../queryConfig/NodeQueryConfig";
+import { DetailContainer } from "../ArticleDetail";
 
 const styles = {
   icon: {
@@ -45,7 +48,9 @@ class DetailPage extends Component {
             </div>
           }
         />
-        <ArticleDetailContainer id={id} />
+        <RelayLoading route={new NodeQueryConfig({ id })}>
+          <DetailContainer />
+        </RelayLoading>
         <SectionTitle
           icon="link"
           text="追加备注"
