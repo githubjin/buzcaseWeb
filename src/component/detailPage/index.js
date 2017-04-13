@@ -2,7 +2,7 @@
 
 import React, { Component } from "react";
 import { Button, Icon, Form, Input } from "antd";
-import { withRouter } from "react-router-dom";
+import { withRouter, Link } from "react-router-dom";
 const FormItem = Form.Item;
 import SectionTitle from "../SectionTitle";
 
@@ -39,9 +39,9 @@ class DetailPage extends Component {
               <a onClick={this.back} className="meta-item">
                 <Icon style={styles.icon} type="rollback" />返回
               </a>
-              <a className="meta-item">
+              <Link to={`/edit/${id}`} className="meta-item">
                 <Icon style={styles.icon} type="edit" />编辑
-              </a>
+              </Link>
               <a className="meta-item">
                 <Icon style={styles.icon} type="delete" />删除
               </a>

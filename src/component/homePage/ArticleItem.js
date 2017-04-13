@@ -94,6 +94,7 @@ class ArticleItem extends PureComponent {
   render() {
     const {
       article: {
+        id,
         attachments,
         categories,
         title,
@@ -125,9 +126,9 @@ class ArticleItem extends PureComponent {
             <span>{moment(createdAt).fromNow()}</span>
           </Col>
           <Col span={2} style={styles.bnt}>
-            <a href="#" className="meta-item">
+            <Link to={`/edit/${id}`} className="meta-item">
               <Icon type="edit" style={styles.rightTopIcon} />编辑
-            </a>
+            </Link>
           </Col>
           <Col span={2} style={styles.bnt}>
             <a href="#" className="meta-item meta-item-danger">

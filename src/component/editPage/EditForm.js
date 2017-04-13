@@ -1,5 +1,7 @@
+// @flow
+
 import React from "react";
-import { Form, Cascader, Button, Icon, Input } from "antd";
+import { Form, Button, Icon, Input } from "antd";
 const FormItem = Form.Item;
 import Relay from "react-relay";
 
@@ -7,21 +9,49 @@ import { DetailContainer } from "../ArticleDetail";
 
 import InputItem from "./fields/InputItem";
 import AutoCompleteItem from "./fields/AutoCompleteItem";
+import Tags from "./fields/Tags";
 import Birthtime from "./fields/Birthtime";
 import Textarea from "./fields/Textarea";
 import BirthPlace from "./fields/BirthPlace";
+import EventNoteItem from "./fields/EventNoteItem";
 import RelayLoading from "../RelayLoading";
 import QueryRoute from "../../queryConfig";
 
+const formItemLayout = {
+  labelCol: {
+    xs: { span: 24 },
+    sm: { span: 5 }
+  },
+  wrapperCol: {
+    xs: { span: 24 },
+    sm: { span: 12 }
+  }
+};
+const formItemLayoutWithOutLabel = {
+  wrapperCol: {
+    xs: { span: 24, offset: 0 },
+    sm: { span: 12, offset: 5 }
+  }
+};
+
 class EditForm extends React.Component {
   props: {
-    master: Object
+    master: Object,
+    node: Object,
+    form: Object,
+    onEventInputDelete: (id: number) => void,
+    onEventInputBlur: (id: number) => any,
+    handleSubmit: (values: Object) => void
   };
+  uuid: number;
+  handleSubmit: (e: Object) => void;
+  remove: (k: any) => void;
+  add: () => void;
+
   constructor(props) {
     super(props);
     this.uuid = 0;
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.normFile = this.normFile.bind(this);
     this.remove = this.remove.bind(this);
     this.add = this.add.bind(this);
   }
@@ -30,17 +60,12 @@ class EditForm extends React.Component {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         console.log("Received values of form: ", values);
+        this.props.handleSubmit(values);
       }
     });
   }
-  normFile(e) {
-    console.log("Upload event:", e);
-    if (Array.isArray(e)) {
-      return e;
-    }
-    return e && e.fileList;
-  }
   remove(k) {
+    this.props.onEventInputDelete(k);
     const { form } = this.props;
     // can use data-binding to get
     const keys = form.getFieldValue("keys");
@@ -69,61 +94,28 @@ class EditForm extends React.Component {
   }
   render() {
     const { master, node } = this.props;
-    console.log(master, node);
+    // console.log(master, node);
     const { getFieldDecorator, getFieldValue } = this.props.form;
-    const formItemLayout = {
-      labelCol: {
-        xs: { span: 24 },
-        sm: { span: 5 }
-      },
-      wrapperCol: {
-        xs: { span: 24 },
-        sm: { span: 12 }
-      }
-    };
-    const formItemLayoutWithOutLabel = {
-      wrapperCol: {
-        xs: { span: 24, offset: 0 },
-        sm: { span: 12, offset: 5 }
-      }
-    };
     getFieldDecorator("keys", { initialValue: [] });
     const keys = getFieldValue("keys");
     const formItems = keys.map((k, index) => {
       return (
-        <FormItem
-          {...index === 0 ? formItemLayout : formItemLayoutWithOutLabel}
-          label={index === 0 ? "重要事件" : ""}
-          required={false}
+        <EventNoteItem
+          index={index}
+          formItemLayout={formItemLayout}
+          formItemLayoutWithOutLabel={formItemLayoutWithOutLabel}
+          getFieldDecorator={getFieldDecorator}
+          label="重要事件"
+          prefix="event_"
+          onblur={this.props.onEventInputBlur}
+          getFieldValue={getFieldValue}
+          k={k}
           key={k}
-        >
-          <div style={{ display: "flex", alignItems: "center" }}>
-            {getFieldDecorator(`event-${k}`, {
-              validateTrigger: ["onChange", "onBlur"],
-              rules: [
-                {
-                  required: true,
-                  whitespace: true,
-                  message: `请填写案例人物的重要事件-${k}`
-                }
-              ]
-            })(
-              <Input
-                type="textarea"
-                placeholder="请填写案例人物的重要事件"
-                autosize={{ minRows: 2, maxRows: 10 }}
-                style={{ marginRight: 8 }}
-              />
-            )}
-            <Icon
-              style={{ fontSize: 20, cursor: "pointer" }}
-              className="dynamic-delete-button"
-              type="minus-circle-o"
-              disabled={keys.length === 1}
-              onClick={() => this.remove(k)}
-            />
-          </div>
-        </FormItem>
+          length={keys.length}
+          remove={this.remove}
+          placeholder="请填写案例人物的重要事件"
+          message="请填写案例人物的重要事件"
+        />
       );
     });
     return (
@@ -145,11 +137,11 @@ class EditForm extends React.Component {
           formItemLayout={formItemLayout}
           getFieldDecorator={getFieldDecorator}
         />
-        <AutoCompleteItem
+        <Tags
           formItemLayout={formItemLayout}
           getFieldDecorator={getFieldDecorator}
           label="类别"
-          fieldName="category"
+          fieldName="categories"
           showSearch={true}
           placeholder="请选择案例类别"
           message="案例类别不能为空"
@@ -188,7 +180,7 @@ class EditForm extends React.Component {
             formItemLayout={formItemLayout}
             getFieldDecorator={getFieldDecorator}
             label="出生地点"
-            fieldName="homeplace"
+            fieldName="homePlace"
             placeholder="出生地点"
             message="出生地点不能为空"
             required={true}
@@ -204,11 +196,11 @@ class EditForm extends React.Component {
           placeholder="请选择案例人物学历"
           edges={master.educations.edges}
         />
-        <AutoCompleteItem
+        <Tags
           formItemLayout={formItemLayout}
           getFieldDecorator={getFieldDecorator}
           label="职业"
-          fieldName="job"
+          fieldName="jobs"
           showSearch={true}
           message="人物职业不能为空"
           placeholder="请选择案例人物职业"
@@ -241,7 +233,7 @@ class EditForm extends React.Component {
         <Textarea
           label="命理知识备注"
           placeholder="请填写命理知识备注(可以不填)"
-          fieldName="notes"
+          fieldName="knowledge"
           autosize={{ minRows: 2, maxRows: 20 }}
           getFieldDecorator={getFieldDecorator}
           formItemLayout={formItemLayout}
@@ -256,7 +248,7 @@ class EditForm extends React.Component {
   }
 }
 
-class WrappedEditForm extends React.PureComponent {
+export class WrappedEditForm extends React.PureComponent {
   props: {
     onValuesChange: (props: Object, values: Object) => void
   };
@@ -274,7 +266,7 @@ class WrappedEditForm extends React.PureComponent {
   }
 }
 
-module.exports = Relay.createContainer(WrappedEditForm, {
+export default Relay.createContainer(WrappedEditForm, {
   fragments: {
     node: () => Relay.QL`
         fragment on Article {

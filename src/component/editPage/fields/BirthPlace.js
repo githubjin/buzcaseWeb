@@ -1,8 +1,6 @@
 // @flow
 import React from "react";
-import { Form, Cascader } from "antd";
 import ChinaDivision from "../../common/ChinaDivision";
-const FormItem = Form.Item;
 import Relay from "react-relay";
 
 const emptyRoles = [];

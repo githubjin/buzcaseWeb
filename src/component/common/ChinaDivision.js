@@ -3,7 +3,6 @@
 import React, { PropTypes } from "react";
 import { Form, Cascader } from "antd";
 const FormItem = Form.Item;
-import Relay from "react-relay";
 
 export default class BirthPlace extends React.PureComponent {
   loading: boolean;
@@ -133,7 +132,8 @@ export default class BirthPlace extends React.PureComponent {
     );
   }
   onReadyStateChange(readyState: Object) {
-    var { aborted, done, error } = readyState;
+    // var { aborted, done, error } = readyState;
+    var { done } = readyState;
     if (!done) {
       this.loading = true;
     } else {
@@ -163,8 +163,7 @@ export default class BirthPlace extends React.PureComponent {
       getFieldDecorator,
       fieldName,
       rules,
-      label,
-      placeholder
+      label
     } = this.props;
     return (
       <FormItem hasFeedback {...formItemLayout} label={label}>
