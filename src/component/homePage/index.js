@@ -101,6 +101,7 @@ const Container = Relay.createContainer(HomePage, {
             node{
               id,
               attachments,
+              submit,
               title,
               categories,
               name,
@@ -144,7 +145,7 @@ const Container = Relay.createContainer(HomePage, {
 });
 
 module.exports = (props: any) => (
-  <RelayLoading route={new DicPoolRoute()}>
+  <RelayLoading route={new DicPoolRoute()} forceFetch={true}>
     <Container {...props} />
   </RelayLoading>
 );

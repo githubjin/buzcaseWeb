@@ -48,29 +48,31 @@ class DetailPage extends Component {
             </div>
           }
         />
-        <RelayLoading route={new NodeQueryConfig({ id })}>
-          <DetailContainer />
-        </RelayLoading>
-        <SectionTitle
-          icon="link"
-          text="追加备注"
-          wrapStyle={{
-            paddingTop: 10,
-            marginBottom: 10,
-            marginTop: 20,
-            borderTop: "1px solid #e9e9e9"
-          }}
-        />
-        <div>
-          <Form layout="vertical">
-            <FormItem>
-              <Input type="textarea" />
-            </FormItem>
-            <FormItem style={{ textAlign: "right" }}>
-              <Button type="primary">保存</Button>
-            </FormItem>
-          </Form>
-        </div>
+        <section className="filter-box">
+          <RelayLoading route={new NodeQueryConfig({ id })}>
+            <DetailContainer />
+          </RelayLoading>
+          <SectionTitle
+            icon="link"
+            text="追加备注"
+            wrapStyle={{
+              paddingTop: 10,
+              marginBottom: 10,
+              marginTop: 20,
+              borderTop: "1px solid #e9e9e9"
+            }}
+          />
+          <div>
+            <Form layout="vertical">
+              <FormItem>
+                <Input type="textarea" />
+              </FormItem>
+              <FormItem style={{ textAlign: "right" }}>
+                <Button type="primary">保存</Button>
+              </FormItem>
+            </Form>
+          </div>
+        </section>
       </div>
     );
   }

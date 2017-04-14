@@ -2,6 +2,7 @@
 import React from "react";
 import { Form, DatePicker } from "antd";
 const FormItem = Form.Item;
+import moment from "moment";
 
 module.exports = (props: any) => {
   const {
@@ -11,13 +12,20 @@ module.exports = (props: any) => {
     fieldName,
     placeholder,
     message,
-    required = true
+    required = true,
+    defaultValue = null
   } = props;
+
+  const options: Object = { rules: [{ required: required, message }] };
+  if (defaultValue != null) {
+    options.initialValue = moment(
+      moment(defaultValue).format("YYYY-MM-DD HH:mm"),
+      "YYYY-MM-DD HH:mm"
+    );
+  }
   return (
     <FormItem hasFeedback {...formItemLayout} label={label}>
-      {getFieldDecorator(fieldName, {
-        rules: [{ required: required, message }]
-      })(
+      {getFieldDecorator(fieldName, options)(
         <DatePicker
           placeholder={placeholder}
           format="YYYY-MM-DD HH:mm"

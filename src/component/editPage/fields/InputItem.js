@@ -15,12 +15,14 @@ module.exports = (props: any) => {
     fieldName,
     required,
     message,
-    placeholder
+    placeholder,
+    defaultValue = ""
   } = props;
   return (
     <FormItem hasFeedback {...formItemLayout} label={label}>
       {getFieldDecorator(fieldName, {
-        rules: required ? getRoles(message) : emptyRoles
+        rules: required ? getRoles(message) : emptyRoles,
+        initialValue: defaultValue
       })(<Input placeholder={placeholder} />)}
     </FormItem>
   );

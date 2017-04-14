@@ -1,12 +1,10 @@
 // @flow
 
 import React from "react";
-import { Form, Button, Icon, Input } from "antd";
+import { Form, Button, Icon } from "antd";
 const FormItem = Form.Item;
 import Relay from "react-relay";
-
-import { DetailContainer } from "../ArticleDetail";
-
+// import { DetailContainer } from "../ArticleDetail";
 import InputItem from "./fields/InputItem";
 import AutoCompleteItem from "./fields/AutoCompleteItem";
 import Tags from "./fields/Tags";
@@ -16,6 +14,7 @@ import BirthPlace from "./fields/BirthPlace";
 import EventNoteItem from "./fields/EventNoteItem";
 import RelayLoading from "../RelayLoading";
 import QueryRoute from "../../queryConfig";
+import _ from "lodash";
 
 const formItemLayout = {
   labelCol: {
@@ -41,7 +40,7 @@ class EditForm extends React.Component {
     form: Object,
     onEventInputDelete: (id: number) => void,
     onEventInputBlur: (id: number) => any,
-    handleSubmit: (values: Object) => void
+    handleSubmit: (values: Object, node: Object) => void
   };
   uuid: number;
   handleSubmit: (e: Object) => void;
@@ -59,8 +58,8 @@ class EditForm extends React.Component {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        console.log("Received values of form: ", values);
-        this.props.handleSubmit(values);
+        // console.log("Received values of form: ", values);
+        this.props.handleSubmit(values, this.props.node);
       }
     });
   }
@@ -92,13 +91,64 @@ class EditForm extends React.Component {
       keys: nextKeys
     });
   }
+  getIntialHomeplace = () => {
+    var initialHomeplace: string[];
+    var { node } = this.props;
+    if (!node) {
+      return initialHomeplace;
+    }
+    const { homePlace } = node;
+    if (!homePlace) {
+      return initialHomeplace;
+    }
+    const { province, city, area } = homePlace;
+    if (province) {
+      initialHomeplace = [];
+      initialHomeplace.push(province);
+      if (city) {
+        initialHomeplace.push(city);
+      }
+      if (area) {
+        initialHomeplace.push(area);
+      }
+    }
+    return initialHomeplace;
+  };
+  getEventItemDefaultValue = (id: number | string): string => {
+    if (_.isNumber(id)) {
+      return "";
+    }
+    const { node: { events: { edges } } } = this.props;
+    const currentNode = edges.filter(edge => edge.node.id === id);
+    if (_.isEmpty(currentNode)) {
+      return "";
+    }
+    return currentNode[0].node.text;
+  };
   render() {
-    const { master, node } = this.props;
-    // console.log(master, node);
+    const { master, node = {} } = this.props;
+    const {
+      title,
+      categories,
+      name,
+      gender,
+      birthday,
+      education,
+      jobs,
+      marriage,
+      children,
+      knowledge,
+      events = {}
+    } = node;
+    // console.log("-01-101-101-11--101-101-101-101--101-1-", node);
     const { getFieldDecorator, getFieldValue } = this.props.form;
-    getFieldDecorator("keys", { initialValue: [] });
+    const { edges = [] } = events;
+    getFieldDecorator("keys", {
+      initialValue: edges.map(_node => _node.node.id)
+    });
     const keys = getFieldValue("keys");
     const formItems = keys.map((k, index) => {
+      // console.log(k, "99999999999999999999999999");
       return (
         <EventNoteItem
           index={index}
@@ -109,6 +159,7 @@ class EditForm extends React.Component {
           prefix="event_"
           onblur={this.props.onEventInputBlur}
           getFieldValue={getFieldValue}
+          defaultValue={this.getEventItemDefaultValue(k, index)}
           k={k}
           key={k}
           length={keys.length}
@@ -134,6 +185,7 @@ class EditForm extends React.Component {
           placeholder="请输入案例标题"
           required={true}
           fieldName="title"
+          defaultValue={title}
           formItemLayout={formItemLayout}
           getFieldDecorator={getFieldDecorator}
         />
@@ -141,6 +193,7 @@ class EditForm extends React.Component {
           formItemLayout={formItemLayout}
           getFieldDecorator={getFieldDecorator}
           label="类别"
+          defaultValue={categories}
           fieldName="categories"
           showSearch={true}
           placeholder="请选择案例类别"
@@ -153,6 +206,7 @@ class EditForm extends React.Component {
           placeholder="请输入案例人物姓名/昵称"
           required={true}
           fieldName="name"
+          defaultValue={name}
           formItemLayout={formItemLayout}
           getFieldDecorator={getFieldDecorator}
         />
@@ -162,6 +216,7 @@ class EditForm extends React.Component {
           label="性别"
           fieldName="gender"
           showSearch={true}
+          defaultValue={gender}
           message="性别不能为空"
           placeholder="请选择案例人物性别"
           edges={master.genders.edges}
@@ -171,6 +226,7 @@ class EditForm extends React.Component {
           getFieldDecorator={getFieldDecorator}
           label="出生时间"
           fieldName="birthday"
+          defaultValue={birthday}
           placeholder="出生时间"
           message="出生时间不能为空"
           required={true}
@@ -180,6 +236,7 @@ class EditForm extends React.Component {
             formItemLayout={formItemLayout}
             getFieldDecorator={getFieldDecorator}
             label="出生地点"
+            defaultValue={this.getIntialHomeplace()}
             fieldName="homePlace"
             placeholder="出生地点"
             message="出生地点不能为空"
@@ -191,6 +248,7 @@ class EditForm extends React.Component {
           getFieldDecorator={getFieldDecorator}
           label="学历"
           fieldName="education"
+          defaultValue={education}
           showSearch={true}
           message="学历不能为空"
           placeholder="请选择案例人物学历"
@@ -202,6 +260,7 @@ class EditForm extends React.Component {
           label="职业"
           fieldName="jobs"
           showSearch={true}
+          defaultValue={jobs}
           message="人物职业不能为空"
           placeholder="请选择案例人物职业"
           edges={master.jobs.edges}
@@ -211,6 +270,7 @@ class EditForm extends React.Component {
           getFieldDecorator={getFieldDecorator}
           label="婚姻"
           fieldName="marriage"
+          defaultValue={marriage}
           showSearch={true}
           message="人物婚姻状况不能为空"
           placeholder="请选择案例人物职业"
@@ -220,6 +280,7 @@ class EditForm extends React.Component {
           label="子女"
           placeholder="子女信息(可以不填)"
           fieldName="children"
+          defaultValue={children}
           autosize={{ minRows: 2, maxRows: 10 }}
           getFieldDecorator={getFieldDecorator}
           formItemLayout={formItemLayout}
@@ -234,6 +295,7 @@ class EditForm extends React.Component {
           label="命理知识备注"
           placeholder="请填写命理知识备注(可以不填)"
           fieldName="knowledge"
+          defaultValue={knowledge}
           autosize={{ minRows: 2, maxRows: 20 }}
           getFieldDecorator={getFieldDecorator}
           formItemLayout={formItemLayout}
@@ -250,14 +312,18 @@ class EditForm extends React.Component {
 
 export class WrappedEditForm extends React.PureComponent {
   props: {
-    onValuesChange: (props: Object, values: Object) => void
+    onValuesChange: (props: Object, values: Object) => void,
+    node?: Object
   };
   render() {
+    const { node } = this.props;
     return (
       <div>
         {React.createElement(
           Form.create({
-            onValuesChange: this.props.onValuesChange
+            onValuesChange: (props, values) => {
+              this.props.onValuesChange(props, values, node);
+            }
           })(EditForm),
           { ...this.props }
         )}
@@ -270,7 +336,44 @@ export default Relay.createContainer(WrappedEditForm, {
   fragments: {
     node: () => Relay.QL`
         fragment on Article {
-          ${DetailContainer.getFragment("node")}
-        }`
+          id,
+          attachments,
+          title,
+          categories,
+          name,
+          education,
+          gender,
+          birthday,
+          homePlace {
+            province,
+            city,
+            area
+          },
+          jobs,
+          marriage,
+          children,
+          events {
+            edges {
+              node {
+                id,
+                text,
+                createdAt,
+              }
+            }
+          },
+          knowledge,
+          notes {
+            edges {
+              node {
+                id,
+                text,
+                createdAt,
+              }
+            }
+          },
+          createdAt,
+          submit
+        }
+        `
   }
 });

@@ -11,6 +11,7 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import HomePage from "./component/homePage";
 import Masterinfo from "./component/header/Masterinfo";
 import AddPage from "./component/editPage";
+import ConfigPage from "./component/configPage";
 import Feedback from "./component/feedback";
 import DetailPage from "./component/detailPage";
 import SignPage from "./component/sign";
@@ -21,8 +22,14 @@ class App extends PureComponent {
     return (
       <Router>
         <Switch>
-          <Route path="/signin" component={SignPage} />
-          <Route path="/signup" component={SignPage} />
+          <Route
+            path="/signin"
+            render={props => <SignPage master={this.props.master} {...props} />}
+          />
+          <Route
+            path="/signup"
+            render={props => <SignPage master={this.props.master} {...props} />}
+          />
           <Route
             path="/"
             render={() => (
@@ -37,6 +44,7 @@ class App extends PureComponent {
                     <PrivateRoute path="/edit/:id" component={AddPage} />
                     <PrivateRoute path="/feedback" component={Feedback} />
                     <PrivateRoute path="/detail/:id" component={DetailPage} />
+                    <PrivateRoute path="/config" component={ConfigPage} />
                   </div>
                 </Content>
                 <Footer className="App-footer-wrap">

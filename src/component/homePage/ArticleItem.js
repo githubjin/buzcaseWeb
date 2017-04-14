@@ -44,6 +44,10 @@ const styles = {
     padding: "3px 10px",
     color: "#000"
   },
+  contentWithoutImg: {
+    padding: "3px 0",
+    color: "#000"
+  },
   bold: {
     fontWeight: 500
   },
@@ -109,6 +113,7 @@ class ArticleItem extends PureComponent {
     } = this.props;
     const { showDetail } = this.state;
     const showItem = !showDetail;
+    const hasAttachments = !_.isEmpty(attachments);
     return (
       <div style={styles.wrap}>
         <Row>
@@ -153,30 +158,39 @@ class ArticleItem extends PureComponent {
         </div>
         {showItem &&
           <Row style={{ cursor: "pointer" }}>
-            <Col span={5} onClick={this.viewDetails} style={{ paddingTop: 7 }}>
-              <img
-                src={this.getInlineImage(attachments)}
-                alt="命盘"
-                style={styles.img}
-              />
-            </Col>
-            <Col span={19} style={styles.content}>
-              <div onClick={this.viewDetails}>
-                <span style={styles.bold}>重要事件：</span>
-                {_.truncate(events.edges[0].node.text, { length: 200 })}
-              </div>
+            {hasAttachments &&
+              <Col
+                span={5}
+                onClick={this.viewDetails}
+                style={{ paddingTop: 7 }}
+              >
+                <img
+                  src={this.getInlineImage(attachments)}
+                  alt="命盘"
+                  style={styles.img}
+                />
+              </Col>}
+            <Col
+              span={hasAttachments ? 19 : 24}
+              style={hasAttachments ? styles.content : styles.contentWithoutImg}
+            >
+              {!_.isEmpty(events.edges) &&
+                <div onClick={this.viewDetails}>
+                  <span style={styles.bold}>重要事件：</span>
+                  {_.truncate(events.edges[0].node.text, { length: 200 })}
+                </div>}
               <div>
-                <div>
-                  <span onClick={this.viewDetails} style={styles.bold}>
+                <div onClick={this.viewDetails}>
+                  <span style={styles.bold}>
                     命理知识备注：
                   </span>
-                  <span onClick={this.viewDetails}>
+                  <span>
                     {_.truncate(knowledge, { length: 200 })}
                   </span>
-                  <a onClick={this.showDetailHandler} className="toggle-expand">
-                    显示全部
-                  </a>
                 </div>
+                <a onClick={this.showDetailHandler} className="toggle-expand">
+                  显示全部
+                </a>
               </div>
             </Col>
           </Row>}

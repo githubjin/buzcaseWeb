@@ -18,7 +18,8 @@ module.exports = (props: any) => {
     placeholder,
     message,
     onblur,
-    getFieldValue
+    getFieldValue,
+    defaultValue = ""
   } = props;
   var isvisible = !_.isEmpty(getFieldValue(`${prefix}${k}`));
   return (
@@ -31,6 +32,7 @@ module.exports = (props: any) => {
       <div style={{ display: "flex", alignItems: "center" }}>
         {getFieldDecorator(`${prefix}${k}`, {
           validateTrigger: ["onChange", "onBlur"],
+          initialValue: defaultValue,
           rules: [
             {
               required: true,

@@ -18,12 +18,14 @@ module.exports = (props: any) => {
     placeholder,
     edges,
     message,
-    required = true
+    required = true,
+    defaultValue
   } = props;
   return (
     <FormItem {...formItemLayout} label={label} hasFeedback>
       {getFieldDecorator(fieldName, {
-        rules: required ? getRole(message) : emptyRoles
+        rules: required ? getRole(message) : emptyRoles,
+        initialValue: defaultValue
       })(
         <Select
           mode="tags"
@@ -32,9 +34,11 @@ module.exports = (props: any) => {
           placeholder={placeholder}
           style={{ width: "100%" }}
         >
-          {edges.map(edge => (
-            <Option key={edge.node.name}>{edge.node.name}</Option>
-          ))}
+          {edges
+            .filter(edge => edge.node.order !== 0)
+            .map(edge => (
+              <Option key={edge.node.name}>{edge.node.name}</Option>
+            ))}
         </Select>
       )}
     </FormItem>

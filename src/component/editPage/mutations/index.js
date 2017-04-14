@@ -20,13 +20,19 @@ export default class ArticleMutation extends Relay.Mutation {
         fragment on ArticleMutationPayload {
             keys,
             eventKey2Ids,
-            article {
-                id
-            }
+            article
         }    
     `;
   }
   getConfigs() {
+    if (this.props.doSubmit) {
+      return [
+        {
+          type: "FIELDS_CHANGE",
+          fieldIDs: { article: this.props.input.id }
+        }
+      ];
+    }
     return [
       {
         type: "REQUIRED_CHILDREN",
@@ -46,7 +52,7 @@ export default class ArticleMutation extends Relay.Mutation {
   }
   getVariables() {
     return {
-      ...this.props
+      ...this.props.input
     };
   }
 }

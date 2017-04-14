@@ -17,6 +17,7 @@ class BirthPlaceInForm extends React.PureComponent {
       required = true,
       message,
       placeholder,
+      defaultValue,
       master,
       relay
     } = this.props;
@@ -28,6 +29,7 @@ class BirthPlaceInForm extends React.PureComponent {
         formItemLayout={formItemLayout}
         getFieldDecorator={getFieldDecorator}
         fieldName={fieldName}
+        defaultValue={defaultValue}
         rules={required ? getRules(message) : emptyRoles}
         matchInputWidth={false}
         master={master}

@@ -90,7 +90,7 @@
   margin: 0 0 10px;
   -webkit-transition: all .2s;
   transition: all .2s;
-  padding: 10px 5px;
+  padding: 10px 20px;
   font-size: 14px;
   margin-top: 10px;
   line-height: 2.5;
@@ -163,7 +163,7 @@ a.toggle-expand, .summary-tail-button {
     padding: 0 3px;
     border-radius: 2px;
     font-size: .9em;
-    /*float: right;*/
+    float: right;
 }
 .feedbackModal .ant-modal-close {
     right: 6px;

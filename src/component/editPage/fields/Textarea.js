@@ -16,12 +16,14 @@ module.exports = (props: any) => {
     required = false,
     message,
     placeholder,
-    autosize
+    autosize,
+    defaultValue = ""
   } = props;
   return (
     <FormItem hasFeedback {...formItemLayout} label={label}>
       {getFieldDecorator(fieldName, {
-        roles: required ? getRoles(message) : emptyRoles
+        roles: required ? getRoles(message) : emptyRoles,
+        initialValue: defaultValue
       })(
         <Input type="textarea" placeholder={placeholder} autosize={autosize} />
       )}

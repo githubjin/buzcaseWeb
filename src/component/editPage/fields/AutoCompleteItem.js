@@ -17,15 +17,19 @@ module.exports = (props: any) => {
     placeholder,
     edges,
     message,
-    required = true
+    required = true,
+    defaultValue = ""
   } = props;
   return (
     <FormItem {...formItemLayout} label={label} hasFeedback>
       {getFieldDecorator(fieldName, {
-        rules: required ? getRole(message) : emptyRoles
+        rules: required ? getRole(message) : emptyRoles,
+        initialValue: defaultValue
       })(
         <AutoComplete
-          dataSource={edges.map(edge => edge.node.name)}
+          dataSource={edges
+            .filter(edge => edge.node.order !== 0)
+            .map(edge => edge.node.name)}
           placeholder={placeholder}
         />
       )}

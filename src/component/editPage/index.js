@@ -1,6 +1,7 @@
 // @flow
 import React, { PureComponent } from "react";
 // import { withRouter } from "react-router-dom";
+import { message } from "antd";
 import Relay from "react-relay";
 import ImageUpload from "./ImageUpload";
 import SectionTitle from "../SectionTitle";
@@ -12,7 +13,7 @@ import NodeQueryConfig from "../../queryConfig/NodeQueryConfig";
 import _ from "lodash";
 import ArticleMutation from "./mutations";
 
-const prefix = "article_";
+// const prefix = "article_";
 const event_prefix = "event_";
 
 class AritcleEditor extends PureComponent {
@@ -23,7 +24,9 @@ class AritcleEditor extends PureComponent {
   deletedEventIds: any[];
   allEvents: Object;
   savedEvents: Object;
+  article: ?Object;
   mutating: boolean;
+  submiting: boolean;
   constructor(props) {
     super(props);
     // article fields array
@@ -40,6 +43,9 @@ class AritcleEditor extends PureComponent {
     this.allEvents = {};
     // {event_1: "KAJSDHKASBDSdKJAS="}
     this.savedEvents = {};
+    this.article = null;
+    // 是否提交中
+    this.submiting = false;
   }
   componentDidMount() {
     this.id = this.props.match.params.id;
@@ -50,16 +56,19 @@ class AritcleEditor extends PureComponent {
   idArticleEvent = (fieldName: string): boolean => {
     return _.startsWith(fieldName, event_prefix);
   };
-  onEventInputDelete = (eventKey: number): void => {
+  onEventInputDelete = (eventKey: number | string): void => {
     this.deletedEventIds.push(eventKey);
     var key = `${event_prefix}${eventKey}`;
     var inputObject: Object = { id: this.id };
+    if (_.isString(eventKey)) {
+      this.savedEvents[key] = eventKey;
+    }
     if (!_.isEmpty(this.savedEvents[key])) {
       inputObject.subEvents = [this.savedEvents[key]];
       this.doMutation(inputObject);
     }
   };
-  onEventInputBlur = (eventKey: number): any => {
+  onEventInputBlur = (eventKey: number | string): any => {
     return e => {
       if (this.deletedEventIds.indexOf(eventKey) !== -1) {
         return;
@@ -75,6 +84,9 @@ class AritcleEditor extends PureComponent {
         return;
       }
       // saved
+      if (_.isString(eventKey)) {
+        this.savedEvents[key] = eventKey;
+      }
       if (!_.isEmpty(this.savedEvents[key])) {
         inputObject.eventIds = [this.savedEvents[key]];
         inputObject.eventValues = [this.allEvents[key]];
@@ -85,8 +97,15 @@ class AritcleEditor extends PureComponent {
       this.doMutation(inputObject);
     };
   };
-  onValuesChange(props, values) {
-    // console.log(values);
+  onValuesChange(props, values, articleNode) {
+    // console.log(
+    //   this.currentKey,
+    //   "--------------- onValuesChange -----------------",
+    //   JSON.stringify(values)
+    // );
+    if (!_.isEmpty(articleNode)) {
+      this.article = articleNode;
+    }
     var keys = _.keys(values);
     if (this.isPureAritleField(keys[0])) {
       this.articleValues = { ...this.articleValues, ...values };
@@ -104,12 +123,18 @@ class AritcleEditor extends PureComponent {
     }
     this.currentKey = keys[0];
   }
-  doMutation = (inputObject: Object) => {
+  doMutation = (inputObject: Object, doSubmit: boolean = false) => {
     this.mutating = true;
-    this.props.relay.commitUpdate(new ArticleMutation(inputObject), {
-      onFailure: this.onFailure,
-      onSuccess: this.onSuccess
-    });
+    if (this.article != null) {
+      inputObject = { ...inputObject, submit: this.article.submit };
+    }
+    this.props.relay.commitUpdate(
+      new ArticleMutation({ input: inputObject, doSubmit }),
+      {
+        onFailure: this.onFailure,
+        onSuccess: this.onSuccess
+      }
+    );
   };
   getBirthday(value: Object): string {
     return `Date:${value.valueOf()}`;
@@ -117,13 +142,13 @@ class AritcleEditor extends PureComponent {
   getHomeplace(value: any): string {
     var homeplace = {};
     if (value[0]) {
-      homeplace.province = value[0].split("=")[1];
+      homeplace.province = value[0];
     }
     if (value[1]) {
-      homeplace.province = value[1].split("=")[1];
+      homeplace.city = value[1];
     }
     if (value[2]) {
-      homeplace.province = value[2].split("=")[1];
+      homeplace.area = value[2];
     }
     return JSON.stringify(homeplace);
   }
@@ -138,7 +163,7 @@ class AritcleEditor extends PureComponent {
         if (key === "homePlace") {
           value = this.getHomeplace(value);
         }
-        console.log(value);
+        // console.log(value);
         if (_.isString(value)) {
           return value;
         }
@@ -147,12 +172,18 @@ class AritcleEditor extends PureComponent {
     };
   };
   onFailure = (transaction: Relay.RelayMutationTransaction): void => {
-    console.log("transaction", transaction);
+    // console.log("transaction", transaction);
     this.mutating = false;
+    this.submiting = false;
+    message.error("保存失败！", 3);
   };
   onSuccess = (response: Object): void => {
     this.mutating = false;
-    console.log("response", response);
+    if (this.submiting) {
+      this.submiting = false;
+      message.success("保存成功！", 3);
+    }
+    // console.log("response", response);
     this.id = response.saveArticle.article.id;
     if (!_.isEmpty(response.saveArticle.keys)) {
       this.keyArray = _.drop(this.keyArray, response.saveArticle.keys.length);
@@ -166,22 +197,6 @@ class AritcleEditor extends PureComponent {
       });
       //
     }
-  };
-  values = {
-    keys: [1, 2],
-    title: "asdasd",
-    categories: ["晚婚", "牢狱"],
-    name: "1252833909@qq.com",
-    gender: "男",
-    birthday: "2017-04-18T17:48:03.848Z",
-    education: "小学",
-    jobs: ["导演", "演员", "公务员"],
-    marriage: "已婚",
-    children: "valuesvaluesvaluesvaluesvalues",
-    knowledge: "valuesvaluesvaluesvaluesvalues",
-    homePlace: ["110000=北京市", "110100=市辖区", "110112=通州区"],
-    event_1: "1eventseventseventseventseventsevents",
-    event_2: "2eventseventseventseventseventseventseventsevents"
   };
   toJson(values) {
     return JSON.stringify(values);
@@ -219,13 +234,96 @@ class AritcleEditor extends PureComponent {
       { ids: [], contents: [] }
     );
   };
-  handleSubmit = (values: Object) => {
+  handleNewSubmit = (inputObject: Object, values: Object) => {
+    if (_.isEmpty(this.article)) {
+      this.article = { id: this.id, submit: true };
+    }
+    var { keys } = values;
+    var shouldUpdate = this.getShouldUpdate(keys, values);
+    inputObject.keys = this.getInputKeys();
+    inputObject.values = this.getInputValues(values);
+    inputObject.subEvents = this.getSubEvent(keys);
+    inputObject.addEvents = this.getAddEvent(keys, values);
+    inputObject.eventIds = shouldUpdate.ids;
+    inputObject.eventValues = shouldUpdate.contents;
+    return inputObject;
+  };
+  handleUpdateSubmit = (
+    inputObject: Object,
+    values: Object,
+    articleNode: Object
+  ) => {
+    var { keys } = values;
+    inputObject.keys = this.getInputKeys();
+    inputObject.values = this.getInputValues(values);
+    inputObject.subEvents = this.getUpdateNeedDeletedEvents(keys, articleNode);
+    inputObject.addEvents = this.getUpdateNeedAddedEvents(values, keys);
+    var shouldUpdates = this.getUpdateShould2Update(values, keys, articleNode);
+    inputObject.eventIds = shouldUpdates.ids;
+    inputObject.eventValues = shouldUpdates.contents;
+    return inputObject;
+  };
+  getUpdateShould2Update = (
+    values: Object,
+    keys: Array<*>,
+    articleNode: Object
+  ): Object => {
+    if (_.isEmpty(articleNode.events.edges) || _.isEmpty(keys)) {
+      return { ids: [], contents: [] };
+    }
+    var should2Update = articleNode.events.edges.filter(edge => {
+      return keys.indexOf(edge.node.id) > -1;
+    });
+    var ids = [], contents = [];
+    should2Update.forEach(edge => {
+      ids.push(edge.node.id);
+      var clientKey = `${event_prefix}${edge.node.id}`;
+      contents.push(values[clientKey]);
+    });
+    return { ids, contents };
+  };
+  handleSubmit = (values: Object, articleNode: Object) => {
     // id,keys,values,subEvents,subNotes,addEvents,addNotes,noteIds,noteValues,eventIds,eventValues,submit,
-    console.log(values);
-    console.log(JSON.stringify(values));
     var inputObject: Object = { id: this.id, submit: true };
+    // console.log(JSON.stringify(values));
+    if (_.isEmpty(articleNode)) {
+      inputObject = this.handleNewSubmit(inputObject, values);
+    } else {
+      inputObject = this.handleUpdateSubmit(inputObject, values, articleNode);
+    }
+    this.doMutation(inputObject, true);
+    this.submiting = true;
+  };
+  getUpdateNeedAddedEvents = (values: Object, keys: Array<*>): string[] => {
+    if (_.isEmpty(keys)) {
+      return [];
+    }
+    var finalArr = [];
+    keys.filter(key => {
+      var b = _.isNumber(key);
+      var clientKey = `${event_prefix}${key}`;
+      b = b && _.isEmpty(this.savedEvents[clientKey]);
+      if (b) {
+        finalArr.push(values[clientKey]);
+      }
+      return b;
+    });
+    return finalArr;
+  };
+  getUpdateNeedDeletedEvents = (
+    keys: Array<*>,
+    articleNode: Object
+  ): string[] => {
+    if (_.isEmpty(articleNode.events.edges)) {
+      return [];
+    }
+    var shouldDeletedNode = articleNode.events.edges.filter(edge => {
+      return keys.indexOf(edge.node.id) === -1;
+    });
+    return shouldDeletedNode.map(edge => edge.node.id);
+  };
+  getInputValues = (values: Object): string[] => {
     var {
-      keys,
       title,
       categories,
       name,
@@ -238,12 +336,7 @@ class AritcleEditor extends PureComponent {
       knowledge,
       homePlace
     } = values;
-    inputObject.subEvents = this.getSubEvent(keys);
-    inputObject.addEvents = this.getAddEvent(keys, values);
-    var shouldUpdate = this.getShouldUpdate(keys, values);
-    inputObject.eventIds = shouldUpdate.ids;
-    inputObject.eventValues = shouldUpdate.contents;
-    inputObject.values = [
+    return [
       title,
       this.toJson(categories),
       name,
@@ -256,7 +349,9 @@ class AritcleEditor extends PureComponent {
       knowledge,
       this.getHomeplace(homePlace)
     ];
-    inputObject.keys = [
+  };
+  getInputKeys = (): string[] => {
+    return [
       "title",
       "categories",
       "name",
@@ -269,7 +364,6 @@ class AritcleEditor extends PureComponent {
       "knowledge",
       "homePlace"
     ];
-    this.doMutation(inputObject);
   };
   render() {
     // console.log(this.props);
@@ -307,7 +401,7 @@ class AritcleEditor extends PureComponent {
 }
 
 export var EditorContainer = Relay.createContainer(AritcleEditor, {
-  initialVariables: { provinceCode: "0", cityCode: "0" },
+  // initialVariables: { provinceCode: "0", cityCode: "0" },
   fragments: {
     master: () => Relay.QL`
       fragment on MasterType {
@@ -366,3 +460,20 @@ export default (props: any) => (
     <EditorContainer {...props} />
   </RelayLoading>
 );
+
+// values = {
+//   keys: [1, 2],
+//   title: "asdasd",
+//   categories: ["晚婚", "牢狱"],
+//   name: "1252833909@qq.com",
+//   gender: "男",
+//   birthday: "2017-04-18T17:48:03.848Z",
+//   education: "小学",
+//   jobs: ["导演", "演员", "公务员"],
+//   marriage: "已婚",
+//   children: "valuesvaluesvaluesvaluesvalues",
+//   knowledge: "valuesvaluesvaluesvaluesvalues",
+//   homePlace: ["110000=北京市", "110100=市辖区", "110112=通州区"],
+//   event_1: "1eventseventseventseventseventsevents",
+//   event_2: "2eventseventseventseventseventseventseventsevents"
+// };

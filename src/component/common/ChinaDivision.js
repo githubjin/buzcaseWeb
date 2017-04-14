@@ -17,11 +17,14 @@ export default class BirthPlace extends React.PureComponent {
   getValue: (node: Object) => string;
   getCode: (code: ?string) => string;
   cascader: any;
+  hasNoOperators: boolean;
   constructor(props: any) {
     super(props);
     this.state = {
       width: 100
     };
+    // 还没有过加载操作
+    this.hasNoOperators = true;
     this.loading = false;
     this.onChange = this.onChange.bind(this);
     this.loadData = this.loadData.bind(this);
@@ -47,13 +50,40 @@ export default class BirthPlace extends React.PureComponent {
     }
     return code.split("=")[0];
   }
+  getInitalChildren = () => {
+    const { defaultValue } = this.props;
+    const children = [];
+    if (defaultValue && defaultValue.length > 1) {
+      children.push({
+        value: defaultValue[1],
+        label: defaultValue[1],
+        code: defaultValue[1],
+        isLeaf: false,
+        children: defaultValue.length > 2
+          ? [
+              {
+                value: defaultValue[2],
+                label: defaultValue[2],
+                code: defaultValue[2],
+                isLeaf: true
+              }
+            ]
+          : []
+      });
+      return children;
+    } else {
+      return this.subArea();
+    }
+  };
   provinceFormat() {
     const { master: { provinces: { edges } } } = this.props;
+    // console.log(cities, areas, "00120-0-120120-120-20-12001-20-21210-");
     let provinces = edges.map(edge => ({
-      value: this.getValue(edge.node),
+      value: edge.node.name,
       label: edge.node.name,
       isLeaf: edge.node.isLeaf,
-      children: this.subArea()
+      code: edge.node.code,
+      children: this.hasNoOperators ? this.getInitalChildren() : this.subArea()
     }));
     return provinces;
   }
@@ -63,9 +93,10 @@ export default class BirthPlace extends React.PureComponent {
       return null;
     }
     return edges.map(item => ({
-      value: this.getValue(item),
+      value: item.name,
       label: item.name,
       isLeaf: item.isLeaf,
+      code: item.code,
       children: isCity ? this.subArea(false) : []
     }));
   }
@@ -110,6 +141,7 @@ export default class BirthPlace extends React.PureComponent {
       return;
     }
     this.loading = true;
+    this.hasNoOperators = false;
     if (selectedOptions.length === 0) {
       return;
     }
@@ -117,16 +149,16 @@ export default class BirthPlace extends React.PureComponent {
     const provinceOptions = selectedOptions[0];
     const targetOption = selectedOptions[selectedOptions.length - 1];
     if (selectedOptions.length === 1) {
-      provinceCode = targetOption.value;
+      provinceCode = targetOption.code;
     } else {
-      provinceCode = provinceOptions.value;
-      cityCode = selectedOptions[1].value;
+      provinceCode = provinceOptions.code;
+      cityCode = selectedOptions[1].code;
     }
     targetOption.loading = true;
     this.props.relay.setVariables(
       {
-        provinceCode: this.getCode(provinceCode),
-        cityCode: this.getCode(cityCode)
+        provinceCode,
+        cityCode
       },
       this.onReadyStateChange
     );
@@ -163,12 +195,14 @@ export default class BirthPlace extends React.PureComponent {
       getFieldDecorator,
       fieldName,
       rules,
-      label
+      label,
+      defaultValue
     } = this.props;
     return (
       <FormItem hasFeedback {...formItemLayout} label={label}>
         {getFieldDecorator(fieldName, {
-          rules: rules
+          rules: rules,
+          initialValue: defaultValue
         })(this.renderSingle())}
       </FormItem>
     );

@@ -155,6 +155,8 @@ export default class ArticleDetail extends Component {
       knowledge,
       notes
     } = article;
+    const hasNotes = !_.isEmpty(notes.edges);
+    // console.log(hasNotes, JSON.stringify(notes));
     const { previewVisible, previewImage, showAffix } = this.state;
     return (
       <div
@@ -201,13 +203,13 @@ export default class ArticleDetail extends Component {
               </ul>
             </Col>
           </Row>}
-        {!_.isEmpty(notes) &&
+        {hasNotes &&
           <Row style={styles.itemPadding}>
             <Col span={24}>
               <strong>后续追加：</strong>
             </Col>
           </Row>}
-        {!_.isEmpty(notes) &&
+        {hasNotes &&
           <Row style={styles.itemPadding}>
             <Col span={20} offset={4}>
               <Timeline

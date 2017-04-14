@@ -225,7 +225,7 @@ const Container = Relay.createContainer(Form.create()(Feedback), {
 });
 
 module.exports = (props: any) => (
-  <RelayLoading route={new DicPoolRoute()}>
+  <RelayLoading route={new DicPoolRoute()} forceFetch={true}>
     <Container {...props} />
   </RelayLoading>
 );
