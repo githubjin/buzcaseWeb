@@ -23,11 +23,11 @@ class SignInPanel extends PureComponent {
       <Form id="sign-form" onSubmit={this.handleSubmit} className="login-form">
         <FormItem hasFeedback>
           {getFieldDecorator("username", {
-            rules: [{ required: true, message: "请输入你的用户名或邮箱!" }]
+            rules: [{ required: true, message: "请输入你的用户名!" }]
           })(
             <Input
               prefix={<Icon type="user" style={{ fontSize: 13 }} />}
-              placeholder="用户名或邮箱"
+              placeholder="用户名"
             />
           )}
         </FormItem>

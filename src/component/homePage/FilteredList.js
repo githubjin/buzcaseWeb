@@ -11,6 +11,9 @@ const styles = {
   },
   normal: {
     paddingTop: 30
+  },
+  zeroArticle: {
+    paddingTop: 330
   }
 };
 export default class FilteredList extends PureComponent {
@@ -46,7 +49,11 @@ export default class FilteredList extends PureComponent {
         })}
         <Affix offsetBottom={2} onChange={this.onAffixChange.bind(this)}>
           <Row
-            style={affixed ? styles.affixed : styles.normal}
+            style={
+              affixed
+                ? styles.affixed
+                : edges.length > 0 ? styles.normal : styles.zeroArticle
+            }
             type="flex"
             justify="center"
           >

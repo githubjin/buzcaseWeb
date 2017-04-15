@@ -2,6 +2,7 @@
 import React, { Component, PropTypes } from "react";
 import Relay from "react-relay";
 import { Spin } from "antd";
+import { currentRelay } from "../util";
 
 export default class RelayLoading extends Component {
   // constructor(props: any) {
@@ -18,7 +19,7 @@ export default class RelayLoading extends Component {
       <Relay.Renderer
         Container={child.type}
         queryConfig={routeConfig}
-        environment={Relay.Store}
+        environment={currentRelay.store}
         forceFetch={forceFetch}
         render={({ done, error, props, retry, stale }) => {
           if (error) {

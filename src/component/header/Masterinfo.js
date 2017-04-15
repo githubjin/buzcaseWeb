@@ -1,33 +1,15 @@
 // @flow
 import React from "react";
-import { Menu, Dropdown, Icon } from "antd";
+import { Icon, Menu, Dropdown } from "antd";
 import Relay from "react-relay";
-import { buzcaseUserKey } from "../../env";
+import { withRouter } from "react-router-dom";
+// import styled from "styled-components";
 import _ from "lodash";
+import { logout, getUser } from "../../util";
 
-const menu = (
-  <Menu>
-    <Menu.Item>
-      <a
-        target="_blank"
-        rel="noopener noreferrer"
-        href="http://www.alipay.com/"
-      >
-        设置
-      </a>
-    </Menu.Item>
-    <Menu.Item>
-      <a
-        target="_blank"
-        rel="noopener noreferrer"
-        href="http://www.taobao.com/"
-      >
-        退出
-      </a>
-    </Menu.Item>
-  </Menu>
-);
+// const UserBox = styled.div`
 
+// `;
 class Masterinfo extends React.PureComponent {
   state: { master: Object };
   getUserInfoFromLocal: () => void;
@@ -41,7 +23,7 @@ class Masterinfo extends React.PureComponent {
     this.getMaster = this.getMaster.bind(this);
   }
   getUserInfoFromLocal() {
-    var user = window.localStorage.getItem(buzcaseUserKey);
+    var user = getUser();
     if (!_.isEmpty(user)) {
       var master = JSON.parse(user);
       this.setState({ master });
@@ -58,20 +40,40 @@ class Masterinfo extends React.PureComponent {
     }
     return this.props.master;
   }
+  _logout = () => {
+    logout(() => this.props.history.push("/signin"));
+  };
+  handleMenuClick = e => {
+    if (e.key === "2") {
+      this._logout();
+    }
+    if (e.key === "1") {
+      this.props.history.push("/drafts");
+    }
+  };
   render() {
-    // console.log("UserInfo props are : ", this.props);
+    const menu = (
+      <Menu onClick={this.handleMenuClick}>
+        <Menu.Item key="1">
+          草稿
+        </Menu.Item>
+        <Menu.Item key="2">
+          退出
+        </Menu.Item>
+      </Menu>
+    );
     const master = this.getMaster();
     return (
-      <Dropdown overlay={menu} placement="bottomCenter">
-        <a className="ant-dropdown-link" href="#">
-          <Icon type="user" /> {master.username}
+      <Dropdown overlay={menu}>
+        <a className="ant-dropdown-link">
+          你好，{master.username} <Icon type="down" />
         </a>
       </Dropdown>
     );
   }
 }
 
-module.exports = Relay.createContainer(Masterinfo, {
+module.exports = Relay.createContainer(withRouter(Masterinfo), {
   fragments: {
     master: () => Relay.QL`
       fragment on MasterType {

@@ -4,7 +4,7 @@ import App from "./App";
 import "./index.css";
 import Relay from "react-relay";
 import { Spin } from "antd";
-import initRelayNetworkLayer from "./initRelayNetworkLayer";
+// import initRelayNetworkLayer from "./initRelayNetworkLayer";
 import AppRoute from "./queryConfig";
 import styled from "styled-components";
 import Logo from "./images/Icon-60@3x.png";
@@ -33,7 +33,7 @@ const ErrorWords = styled.p`
   font-size: 15px;
   margin-bottom: 20px;
 `;
-initRelayNetworkLayer();
+// initRelayNetworkLayer();
 
 /*ReactDOM.render(
   <Loading>

@@ -1,5 +1,5 @@
 # 在babel-preset-react-app index.js 文件内plugins添加  "/Users/Yo/git/8ziku/web-client/plugins/babelRelayPlugin.js",
-# 修改webpack dev start.js添加 proxy: {'/graphql': `http://localhost:1337/graphql`},
+# 修改webpack dev start.js添加 proxy: {'/graphql': `http://localhost:1337/graphql`,"/logout": `http://localhost:1337/logout`},
 # schema 修改后不起作用，可修改 webpack.dev.js的 cacheDirectory: false
 
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).

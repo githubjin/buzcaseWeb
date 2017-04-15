@@ -7,7 +7,12 @@ const { Content, Footer } = Layout;
 import Header from "./component/header";
 import Relay from "react-relay";
 
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch,
+  Redirect
+} from "react-router-dom";
 import HomePage from "./component/homePage";
 import Masterinfo from "./component/header/Masterinfo";
 import AddPage from "./component/editPage";
@@ -15,6 +20,7 @@ import ConfigPage from "./component/configPage";
 import Feedback from "./component/feedback";
 import DetailPage from "./component/detailPage";
 import SignPage from "./component/sign";
+import DraftsPage from "./component/drafts";
 import PrivateRoute from "./routes/PrivateRoute";
 
 class App extends PureComponent {
@@ -45,6 +51,7 @@ class App extends PureComponent {
                     <PrivateRoute path="/feedback" component={Feedback} />
                     <PrivateRoute path="/detail/:id" component={DetailPage} />
                     <PrivateRoute path="/config" component={ConfigPage} />
+                    <PrivateRoute path="/drafts" component={DraftsPage} />
                   </div>
                 </Content>
                 <Footer className="App-footer-wrap">
@@ -59,6 +66,17 @@ class App extends PureComponent {
                 <BackTop />
               </Layout>
             )}
+          />
+          <Route
+            render={(props: any) => {
+              return (
+                <Redirect
+                  to={{
+                    pathname: "/"
+                  }}
+                />
+              );
+            }}
           />
         </Switch>
       </Router>

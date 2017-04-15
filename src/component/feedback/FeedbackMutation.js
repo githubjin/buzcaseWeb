@@ -46,7 +46,7 @@ export default class FeedbackMutation extends Relay.Mutation {
   }
   getVariables() {
     return {
-      isPublic: this.props.isPublic,
+      isPublic: this.props.isPublic === "0" ? false : true,
       text: this.props.text
     };
   }

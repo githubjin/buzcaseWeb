@@ -1,7 +1,8 @@
 // @flow
 import React, { PureComponent } from "react";
-// import { withRouter } from "react-router-dom";
-import { message } from "antd";
+import { Link } from "react-router-dom";
+import styled from "styled-components";
+import { message, Icon, Button } from "antd";
 import Relay from "react-relay";
 import ImageUpload from "./ImageUpload";
 import SectionTitle from "../SectionTitle";
@@ -13,6 +14,10 @@ import NodeQueryConfig from "../../queryConfig/NodeQueryConfig";
 import _ from "lodash";
 import ArticleMutation from "./mutations";
 
+const RightTitleBox = styled.div`
+  text-align: right;
+  font-size: 14px;     
+`;
 // const prefix = "article_";
 const event_prefix = "event_";
 type Task = {
@@ -424,7 +429,19 @@ class AritcleEditor extends PureComponent {
     const { match: { params: { id } } } = this.props;
     return (
       <div>
-        <SectionTitle icon="edit" text="编辑案例信息" />
+        <SectionTitle
+          icon="edit"
+          text="编辑案例信息"
+          left={
+            <RightTitleBox>
+              <Link to="/drafts">
+                <Button type="dashed" size="small">
+                  <Icon type="file-text" /> 草稿
+                </Button>
+              </Link>
+            </RightTitleBox>
+          }
+        />
         <section className="filter-box">
           <RowX>
             <ImageUpload />

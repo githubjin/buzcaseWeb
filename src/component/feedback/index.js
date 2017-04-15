@@ -133,8 +133,8 @@ class Feedback extends Component {
           icon="message"
           text="意见反馈"
           left={
-            <div style={{ textAlign: "right", fontSize: 13 }}>
-              <Button size="small" onClick={this.showModal}>
+            <div style={{ textAlign: "right", fontSize: 14 }}>
+              <Button type="dashed" size="small" onClick={this.showModal}>
                 <Icon type="edit" />新建反馈
               </Button>
             </div>
