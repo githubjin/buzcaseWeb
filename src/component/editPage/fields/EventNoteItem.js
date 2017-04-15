@@ -43,10 +43,7 @@ module.exports = (props: any) => {
         })(
           <Input
             type="textarea"
-            onBlur={_.debounce(onblur(k), 2000, {
-              leading: false,
-              trailing: true
-            })}
+            onBlur={onblur(k)}
             placeholder={placeholder}
             autosize={{ minRows: 2, maxRows: 10 }}
             style={{ marginRight: 8 }}

@@ -70,7 +70,7 @@ const marriageFatQuery = Relay.QL`
 `;
 // configs
 function getAddconfigs(type: string, masterId: string) {
-  var prefix = `code(${type}).first(99999)`;
+  var prefix = `code("${type}").first(99999)`;
   var rangeBehaviors = { "": "ignore" };
   rangeBehaviors[prefix] = "append";
   return [
@@ -80,7 +80,14 @@ function getAddconfigs(type: string, masterId: string) {
       parentID: masterId,
       connectionName: "dic",
       edgeName: "newEdge",
-      rangeBehaviors
+      rangeBehaviors: (ast: any) => {
+        console.log(ast);
+        if (ast.code === type) {
+          return "append";
+        } else {
+          return "ignore";
+        }
+      }
     }
   ];
 }

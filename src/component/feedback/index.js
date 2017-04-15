@@ -195,7 +195,7 @@ class Feedback extends Component {
 const Container = Relay.createContainer(Form.create()(Feedback), {
   initialVariables: {
     page: 1,
-    pageSize: 10,
+    pageSize: 20,
     sorters: [{ order: "createdAt", dir: "DESC" }]
   },
   fragments: {
@@ -225,7 +225,7 @@ const Container = Relay.createContainer(Form.create()(Feedback), {
 });
 
 module.exports = (props: any) => (
-  <RelayLoading route={new DicPoolRoute()} forceFetch={true}>
+  <RelayLoading route={new DicPoolRoute()}>
     <Container {...props} />
   </RelayLoading>
 );

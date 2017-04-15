@@ -143,7 +143,7 @@ class ArticleItem extends PureComponent {
         </Row>
         <Row style={styles.title}>
           <Col span={24}>
-            <Link to="/detail/1">{title}</Link>
+            <Link to={`/detail/${id}`}>{title}</Link>
           </Col>
         </Row>
         <div>

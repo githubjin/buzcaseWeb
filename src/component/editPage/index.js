@@ -15,7 +15,10 @@ import ArticleMutation from "./mutations";
 
 // const prefix = "article_";
 const event_prefix = "event_";
-
+type Task = {
+  func: (...args: Array<*>) => any,
+  args: Array<*>
+};
 class AritcleEditor extends PureComponent {
   keyArray: string[];
   currentKey: string;
@@ -27,6 +30,7 @@ class AritcleEditor extends PureComponent {
   article: ?Object;
   mutating: boolean;
   submiting: boolean;
+  tasks: Array<Task>;
   constructor(props) {
     super(props);
     // article fields array
@@ -46,6 +50,8 @@ class AritcleEditor extends PureComponent {
     this.article = null;
     // 是否提交中
     this.submiting = false;
+    // 提交任务队列，线性执行
+    this.tasks = [];
   }
   componentDidMount() {
     this.id = this.props.match.params.id;
@@ -56,7 +62,10 @@ class AritcleEditor extends PureComponent {
   idArticleEvent = (fieldName: string): boolean => {
     return _.startsWith(fieldName, event_prefix);
   };
-  onEventInputDelete = (eventKey: number | string): void => {
+  onEventInputDelete = (
+    eventKey: number | string,
+    force: boolean = false
+  ): void => {
     this.deletedEventIds.push(eventKey);
     var key = `${event_prefix}${eventKey}`;
     var inputObject: Object = { id: this.id };
@@ -64,11 +73,21 @@ class AritcleEditor extends PureComponent {
       this.savedEvents[key] = eventKey;
     }
     if (!_.isEmpty(this.savedEvents[key])) {
+      this.tasks.push({
+        func: this.onEventInputDelete,
+        args: [eventKey]
+      });
+      if (this.tasks.length > 1 && !force) {
+        return;
+      }
       inputObject.subEvents = [this.savedEvents[key]];
       this.doMutation(inputObject);
     }
   };
-  onEventInputBlur = (eventKey: number | string): any => {
+  onEventInputBlur = (
+    eventKey: number | string,
+    force: boolean = false
+  ): any => {
     return e => {
       if (this.deletedEventIds.indexOf(eventKey) !== -1) {
         return;
@@ -81,6 +100,13 @@ class AritcleEditor extends PureComponent {
       } = { id: this.id };
       var key = `${event_prefix}${eventKey}`;
       if (_.isEmpty(this.allEvents[key])) {
+        return;
+      }
+      this.tasks.push({
+        func: this.onEventInputBlur(eventKey, true),
+        args: []
+      });
+      if (this.tasks.length > 1 && !force) {
         return;
       }
       // saved
@@ -97,7 +123,7 @@ class AritcleEditor extends PureComponent {
       this.doMutation(inputObject);
     };
   };
-  onValuesChange(props, values, articleNode) {
+  onValuesChange(props, values, articleNode, force: boolean = false) {
     // console.log(
     //   this.currentKey,
     //   "--------------- onValuesChange -----------------",
@@ -118,10 +144,20 @@ class AritcleEditor extends PureComponent {
       this.currentKey !== keys[0] &&
       this.isPureAritleField(this.currentKey)
     ) {
+      this.tasks.push({
+        func: this.onValuesChange,
+        args: [props, values, articleNode]
+      });
+      console.log(this.tasks, this.tasks.length, force);
+      if (this.tasks.length > 1 && !force) {
+        return;
+      }
       this.keyArray.push(this.currentKey);
       this.doMutation({ id: this.id, ...this.getFieldsForMutation() });
     }
-    this.currentKey = keys[0];
+    if (!force) {
+      this.currentKey = keys[0];
+    }
   }
   doMutation = (inputObject: Object, doSubmit: boolean = false) => {
     this.mutating = true;
@@ -171,11 +207,20 @@ class AritcleEditor extends PureComponent {
       })
     };
   };
+  dropTask = () => {
+    console.log("this.tasks.length = ", this.tasks.length);
+    this.tasks = _.drop(this.tasks, 1);
+    if (this.tasks.length > 0) {
+      var { func, args } = this.tasks[0];
+      func(...args, true);
+    }
+  };
   onFailure = (transaction: Relay.RelayMutationTransaction): void => {
     // console.log("transaction", transaction);
     this.mutating = false;
     this.submiting = false;
     message.error("保存失败！", 3);
+    this.dropTask();
   };
   onSuccess = (response: Object): void => {
     this.mutating = false;
@@ -197,6 +242,7 @@ class AritcleEditor extends PureComponent {
       });
       //
     }
+    this.dropTask();
   };
   toJson(values) {
     return JSON.stringify(values);
@@ -282,7 +328,15 @@ class AritcleEditor extends PureComponent {
     });
     return { ids, contents };
   };
-  handleSubmit = (values: Object, articleNode: Object) => {
+  handleSubmit = (
+    values: Object,
+    articleNode: Object,
+    force: boolean = false
+  ) => {
+    this.tasks.push({ func: this.handleSubmit, args: [values, articleNode] });
+    if (this.tasks.length > 1 && !force) {
+      return;
+    }
     // id,keys,values,subEvents,subNotes,addEvents,addNotes,noteIds,noteValues,eventIds,eventValues,submit,
     var inputObject: Object = { id: this.id, submit: true };
     // console.log(JSON.stringify(values));

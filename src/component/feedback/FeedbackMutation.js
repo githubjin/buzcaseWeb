@@ -34,16 +34,12 @@ export default class FeedbackMutation extends Relay.Mutation {
         parentID: this.props.master.id,
         connectionName: "feedbacks",
         edgeName: "newEdge",
-        // rangeBehaviors: (calls: Object) => {
-        //   console.log("Calls are : ", calls);
-        //   if (calls.page === 1) {
-        //     return "prepend";
-        //   } else {
-        //     return "ignore";
-        //   }
-        // }
-        rangeBehaviors: {
-          "": "refetch"
+        rangeBehaviors: (calls: Object) => {
+          if (calls.page === 1) {
+            return "prepend";
+          } else {
+            return "ignore";
+          }
         }
       }
     ];

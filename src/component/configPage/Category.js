@@ -15,7 +15,8 @@ const styles = {
 };
 
 const Box = styled.div`
-    margin-top: 20px;
+    margin-top: 40px;
+    margin-bottom: 20px;
     margin-left: 10px;
     display: flex;
     flex-wrap: wrap;
@@ -65,6 +66,7 @@ export default class Category extends React.PureComponent {
           const isLongTag = tag.length > 20;
           const tagElem = (
             <Tag
+              color="blue"
               style={{ fontSize: 14, marginBottom: 20 }}
               key={tag.node.id}
               closable={index !== 0}
