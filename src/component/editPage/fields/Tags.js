@@ -19,7 +19,8 @@ module.exports = (props: any) => {
     edges,
     message,
     required = true,
-    defaultValue
+    defaultValue,
+    onBlur
   } = props;
   return (
     <FormItem {...formItemLayout} label={label} hasFeedback>
@@ -32,6 +33,7 @@ module.exports = (props: any) => {
           tags={true}
           allowClear
           placeholder={placeholder}
+          onBlur={onBlur}
           style={{ width: "100%" }}
         >
           {edges

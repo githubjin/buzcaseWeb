@@ -17,15 +17,21 @@ module.exports = (props: any) => {
     message,
     placeholder,
     autosize,
-    defaultValue = ""
+    defaultValue = "",
+    onKeyUp = () => {}
   } = props;
   return (
     <FormItem hasFeedback {...formItemLayout} label={label}>
       {getFieldDecorator(fieldName, {
-        roles: required ? getRoles(message) : emptyRoles,
+        rules: required ? getRoles(message) : emptyRoles,
         initialValue: defaultValue
       })(
-        <Input type="textarea" placeholder={placeholder} autosize={autosize} />
+        <Input
+          onKeyUp={onKeyUp}
+          type="textarea"
+          placeholder={placeholder}
+          autosize={autosize}
+        />
       )}
     </FormItem>
   );

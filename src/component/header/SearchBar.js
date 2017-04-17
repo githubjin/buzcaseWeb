@@ -1,79 +1,217 @@
-import React from 'react';
-import { Icon, Button, Input, AutoComplete } from 'antd';
-const Option = AutoComplete.Option;
+// @flow
 
-function onSelect(value) {
-  console.log('onSelect', value);
-}
-
-function getRandomInt(max, min = 0) {
-  return Math.floor(Math.random() * (max - min + 1)) + min; // eslint-disable-line no-mixed-operators
-}
-
-function searchResult(query) {
-  return (new Array(getRandomInt(5))).join('.').split('.')
-    .map((item, idx) => ({
-      query,
-      category: `${query}${idx}`,
-      count: getRandomInt(200, 100),
-    }));
-}
-
-function renderOption(item) {
-  return (
-    <Option key={item.category} text={item.category}>
-      {item.query} 在
-      <a
-        href={`https://s.taobao.com/search?q=${item.query}`}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        {item.category}
-      </a>
-      区块中
-      <span className="global-search-item-count">约 {item.count} 个结果</span>
-    </Option>
-  );
-}
-
-export default class Complete extends React.Component {
+import React from "react";
+import { Input, Tag } from "antd";
+const Search = Input.Search;
+import { Link } from "react-router-dom";
+import Relay from "react-relay";
+import MasterQueryConfig from "../../queryConfig";
+import RelayLoading from "../RelayLoading";
+import styled from "styled-components";
+import _ from "lodash";
+import moment from "moment";
+const Background = styled.div`
+  width: 100%;
+  height: 100%;
+  z-index: 998;
+  position: absolute;
+  top: 47px;
+  left: 0px;
+`;
+const ResultBox = styled.div`
+  background: #fff;
+  width: 489px;
+  height: auto;
+  position: absolute;
+  z-index: 999;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
+  background-clip: padding-box;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 5px;
+  top: 47px;
+`;
+const ItemBox = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+const ResultItem = styled.div`
+  padding: 1px;
+  line-height: 30px;
+  padding-left: 5px;
+`;
+const ResultTitle = styled.div`
+  line-height: 20px;
+  padding-left: 5px;
+  background: #e9e9e9;
+  font-size: 14px;
+`;
+const Timer = styled.span`
+    float: right;
+    font-size: 12px;
+    float: right;
+    font-size: 12px;
+    margin-right: 5px;
+    font-weight: 500;
+`;
+class Complete extends React.PureComponent {
+  handleChange: (value: string) => void;
+  loading: boolean;
+  state: {
+    isVisible: boolean
+  };
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
+    this.loading = false;
     this.state = {
-      dataSource: [],
-    }
+      isVisible: false
+    };
   }
 
   handleChange(value) {
-    this.setState({
-      dataSource: value ? searchResult(value) : [],
-    });
+    this.setState({ isVisible: true });
+    this.props.relay.setVariables(
+      {
+        token: value
+      },
+      this.onReadyStateChange
+    );
   }
+  backgroundClick = e => {
+    this.setState({ isVisible: false });
+  };
+  onReadyStateChange = (readyState: Object) => {
+    var { done } = readyState;
+    if (!done) {
+      this.loading = true;
+    } else {
+      this.loading = false;
+    }
+  };
+  createMarkup = (htmlString: string) => {
+    return { __html: htmlString };
+  };
 
-  render() {
-    const { dataSource } = this.state;
+  renderHightLight = (htmlString: string) => {
+    // console.log(htmlString);
+    return <span dangerouslySetInnerHTML={this.createMarkup(htmlString)} />;
+  };
+  renderOption = (items, field, title): any => {
+    // console.log(items);
+    if (_.isEmpty(items)) {
+      return null;
+    }
+    // console.log("items are", JSON.stringify(items));
     return (
-      <div className="global-search-wrapper" style={{ width: 367 }}>
-        <AutoComplete
-          className="global-search"
+      <ItemBox>
+        <ResultTitle>{title}</ResultTitle>
+        {items.map(item => (
+          <ResultItem key={item.article}>
+            <Tag style={{ fontSize: 14 }}>
+              <Link to={`/detail/${item.article}`}>
+                {this.renderHightLight(item[field])}
+              </Link>
+            </Tag>
+            <Timer>
+              {moment(item.createdAt, "YYYY-MM-DD hh:mm").fromNow()}
+            </Timer>
+          </ResultItem>
+        ))}
+      </ItemBox>
+    );
+  };
+  // shouldComponentUpdate(nextProps, nextState) {
+  //   const {
+  //     master: { autocomplete: { names = [], titles = [] } = {} }
+  //   } = this.props;
+  //   const {
+  //     master: {
+  //       autocomplete: { names: namesNext = [], titles: titlesNext = [] } = {}
+  //     }
+  //   } = nextProps;
+  //   return (
+  //     names.length !== namesNext.length || titles.length !== titlesNext.length
+  //   );
+  // console.log(names, titles);
+  // console.log("-------------");
+  // console.log(namesNext, titlesNext);
+  // return true;
+  // }
+  render() {
+    // console.log("e.keyCode is ", e.keyCode, e.target.value);
+    const {
+      master: { autocomplete: { names = [], titles = [] } = {} }
+    } = this.props;
+    // console.log(this.props.master);
+    const isVisible =
+      this.state.isVisible && (names.length > 0 || titles.length > 0);
+    return (
+      <div style={{ width: 367 }}>
+        <Search
           size="large"
-          style={{ width: '100%' }}
-          dataSource={dataSource.map(renderOption)}
-          onSelect={onSelect}
-          onChange={this.handleChange}
-          placeholder="搜索你要找的内容..."
-          optionLabelProp="text"
-        >
-          <Input className="searchbar-input"
-            suffix={(
-              <Button className="search-btn" size="large" type="primary">
-                <Icon type="search" />
-              </Button>
-            )}
-          />
-        </AutoComplete>
+          placeholder="搜索姓名或标题"
+          onClick={e => {
+            this.handleChange(e.target.value);
+          }}
+          onKeyUp={e => {
+            if (
+              e.keyCode === 32 ||
+              e.keyCode === 8 ||
+              (e.keyCode > 47 && e.keyCode < 58)
+            ) {
+              this.handleChange(e.target.value);
+            }
+          }}
+          onSearch={this.handleChange}
+        />
+        {isVisible && <Background onClick={this.backgroundClick} />}
+        {isVisible &&
+          <ResultBox>
+            {this.renderOption(names, "name", "姓名")}
+            {this.renderOption(titles, "title", "标题")}
+          </ResultBox>}
       </div>
     );
   }
 }
+
+const Container = Relay.createContainer(Complete, {
+  initialVariables: { token: "", size: 50, skip: false },
+  prepareVariables: prevVariables => {
+    return {
+      ...prevVariables,
+      skip: prevVariables.token === ""
+    };
+  },
+  fragments: {
+    master: () => Relay.QL`
+    fragment on MasterType {
+      autocomplete(token: $token, size:$size) @skip(if: $skip) {
+        names {
+          article
+          name
+          title
+          highlight
+          createdAt
+        }
+        titles {
+          article
+          name
+          title
+          highlight
+          createdAt
+        }
+      }
+    }
+    `
+  }
+});
+
+export default (props: any) => {
+  return (
+    <RelayLoading route={new MasterQueryConfig()} forceFetch={true}>
+      <Container />
+    </RelayLoading>
+  );
+};

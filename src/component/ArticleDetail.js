@@ -1,7 +1,16 @@
 // @flow
 
 import React, { Component, PropTypes } from "react";
-import { Affix, Button, Row, Col, Modal, Icon, Timeline } from "antd";
+import {
+  Affix,
+  Button,
+  Row,
+  Col,
+  Modal,
+  Icon,
+  Timeline,
+  Popconfirm
+} from "antd";
 import Slider from "react-slick";
 import _ from "lodash";
 import Relay from "react-relay";
@@ -31,6 +40,20 @@ const styles = {
   },
   itemPadding: {
     paddingBottom: 10
+  },
+  empty: {
+    width: "100%",
+    display: "inline-block"
+  },
+  focusNote: {
+    color: "#f04134",
+    width: "100%",
+    display: "inline-block"
+  },
+  note_del_bnt: {
+    backgroundColor: "rgb(255, 255, 255)",
+    boxShadow: "none",
+    borderRightColor: "rgb(255, 255, 255)"
   }
 };
 
@@ -52,7 +75,8 @@ export default class ArticleDetail extends Component {
   state: {
     previewVisible: boolean,
     previewImage: string,
-    showAffix: boolean
+    showAffix: boolean,
+    focusNote: ?string
   };
   showPic: (img: string) => void;
   handleCancel: () => void;
@@ -64,7 +88,8 @@ export default class ArticleDetail extends Component {
     this.state = {
       previewVisible: false,
       previewImage: "",
-      showAffix: false
+      showAffix: false,
+      focusNote: null
     };
     this.showPic = this.showPic.bind(this);
     this.handleCancel = this.handleCancel.bind(this);
@@ -142,8 +167,15 @@ export default class ArticleDetail extends Component {
       </Slider>
     );
   }
+  noteFocus = (noteId: string) => {
+    return () => {
+      this.setState({
+        focusNote: noteId
+      });
+    };
+  };
   render() {
-    const { affix = false } = this.props;
+    const { affix = false, removeNote = () => () => {} } = this.props;
     const article = this.props.article || this.props.node;
     const {
       attachments,
@@ -211,28 +243,56 @@ export default class ArticleDetail extends Component {
           </Row>}
         {hasNotes &&
           <Row style={styles.itemPadding}>
-            <Col span={20} offset={4}>
+            <Col span={22} offset={2}>
               <Timeline
                 style={{ marginTop: 5 }}
                 className="articleDetial"
-                pending={<a href="#">更多</a>}
+                pending={<a />}
               >
                 {notes.edges.map((note, i) => (
                   <Timeline.Item
                     key={note.node.id}
                     dot={
                       <span>
-                        <span style={{ paddingRight: 7 }}>
+                        <span style={{ paddingRight: 7, color: "#a0a0a0" }}>
                           {moment(note.node.createdAt).fromNow()}
                         </span>
                         <Icon
                           type="clock-circle-o"
-                          style={{ fontSize: "16px" }}
+                          style={{ fontSize: "16px", color: "#a0a0a0" }}
                         />
                       </span>
                     }
                   >
-                    {note.node.text}
+                    <span
+                      style={
+                        note.node.id === this.state.focusNote
+                          ? styles.focusNote
+                          : styles.empty
+                      }
+                    >
+                      {note.node.text}
+                      {this.props.node &&
+                        <Popconfirm
+                          title="你确定要删除该条备注吗？"
+                          okText="是"
+                          cancelText="否"
+                          onConfirm={removeNote(note.node.id)}
+                        >
+                          <Button
+                            style={{ float: "right" }}
+                            icon="delete"
+                            shape="circle"
+                            ghost
+                            size="small"
+                            type="danger"
+                            onMouseLeave={() => {
+                              this.setState({ focusNote: null });
+                            }}
+                            onMouseEnter={this.noteFocus(note.node.id)}
+                          />
+                        </Popconfirm>}
+                    </span>
                   </Timeline.Item>
                 ))}
               </Timeline>

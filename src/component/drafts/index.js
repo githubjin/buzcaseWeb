@@ -98,14 +98,14 @@ class Drafts extends React.PureComponent {
     };
   };
   onFailure = (transaction: Relay.RelayMutationTransaction): void => {
-    message.success("error !", 2);
+    message.error("error !", 2);
   };
   onSuccess = (response: Object): void => {
     message.success("success !", 2);
   };
   render() {
     const { master: { articles: { edges } } } = this.props;
-    console.log(edges);
+    // console.log(edges);
     return (
       <div>
         <SectionTitle icon="file-text" text="草稿" />
@@ -186,6 +186,15 @@ var DraftsContainer = Relay.createContainer(Drafts, {
                 area
               },
               jobs,
+              events {
+                edges {
+                  node {
+                    id,
+                    text,
+                    createdAt,
+                  }
+                }
+              },
               marriage,
               children,
               knowledge,

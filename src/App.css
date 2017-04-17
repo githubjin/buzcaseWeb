@@ -266,3 +266,11 @@ a.toggle-expand, .summary-tail-button {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+.ant-input-search-icon {
+  margin-top: 3px;
+}
+.highlight {
+  color: #f44336;
+  font-weight: 500;
+}

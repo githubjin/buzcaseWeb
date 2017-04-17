@@ -17,7 +17,7 @@ export default class DictDropdown extends PureComponent {
     this.renderOverlay = this.renderOverlay.bind(this);
   }
   handleMenuClick(e: any) {
-    console.log(e.key, e.item.props.children);
+    // console.log(e.key, e.item.props.children);
     const { doSearch, fieldName } = this.props;
     doSearch(
       (() => {

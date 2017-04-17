@@ -13,7 +13,8 @@ module.exports = (props: any) => {
     placeholder,
     message,
     required = true,
-    defaultValue = null
+    defaultValue = null,
+    onBlur
   } = props;
 
   const options: Object = { rules: [{ required: required, message }] };
@@ -27,6 +28,7 @@ module.exports = (props: any) => {
     <FormItem hasFeedback {...formItemLayout} label={label}>
       {getFieldDecorator(fieldName, options)(
         <DatePicker
+          onOk={onBlur}
           placeholder={placeholder}
           format="YYYY-MM-DD HH:mm"
           showTime={true}

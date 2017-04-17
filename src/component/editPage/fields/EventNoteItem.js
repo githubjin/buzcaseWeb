@@ -17,14 +17,15 @@ module.exports = (props: any) => {
     remove,
     placeholder,
     message,
-    onblur,
+    onKeyUp,
     getFieldValue,
     defaultValue = ""
   } = props;
   var isvisible = !_.isEmpty(getFieldValue(`${prefix}${k}`));
+  // onBlur={onblur(k)}
   return (
     <FormItem
-      {...index === 0 ? formItemLayout : formItemLayoutWithOutLabel}
+      {...(index === 0 ? formItemLayout : formItemLayoutWithOutLabel)}
       label={index === 0 ? label : ""}
       required={false}
       key={k}
@@ -43,7 +44,7 @@ module.exports = (props: any) => {
         })(
           <Input
             type="textarea"
-            onBlur={onblur(k)}
+            onKeyUp={onKeyUp(k)}
             placeholder={placeholder}
             autosize={{ minRows: 2, maxRows: 10 }}
             style={{ marginRight: 8 }}

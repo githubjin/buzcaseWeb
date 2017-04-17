@@ -10,7 +10,7 @@ export default class BirthPlace extends React.PureComponent {
     width: number
   };
   onChange: (string, Object) => void;
-  loadData: (Object) => void;
+  loadData: Object => void;
   provinceFormat: () => Object[];
   renderInForm: () => any;
   renderSingle: () => any;

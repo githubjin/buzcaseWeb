@@ -9,7 +9,7 @@ import SearchBar from "./SearchBar";
 import Masterinfo from "./Masterinfo";
 import logoWorlds from "./logo.png";
 
-class AppHeader extends React.Component {
+class AppHeader extends React.PureComponent {
   clickHandler: (path: string) => (e: ?Event) => void;
   menuHandler: (obj: Object) => void;
   constructor(props) {

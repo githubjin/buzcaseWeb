@@ -58,11 +58,38 @@ class AritcleEditor extends PureComponent {
     // 提交任务队列，线性执行
     this.tasks = [];
   }
+  consoleState = () => {
+    console.log("this.tasks", this.tasks, this.tasks.length);
+    console.log("this.submiting", this.submiting);
+    console.log("this.savedEvents", this.savedEvents, this.savedEvents.length);
+    console.log("this.keyArray", this.keyArray, this.keyArray.length);
+    console.log("this.currentKey", this.currentKey);
+    console.log("this.allEvents", this.allEvents);
+    console.log("this.articleValues", this.articleValues);
+  };
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.match.params.id !== this.props.match.params.id) {
+      this.keyArray = [];
+      this.currentKey = "";
+      this.articleValues = {};
+      this.id = nextProps.match.params.id;
+      this.deletedEventIds = [];
+      this.allEvents = {};
+      this.savedEvents = {};
+      this.article = null;
+      this.submiting = false;
+      this.tasks = [];
+    }
+  }
   componentDidMount() {
     this.id = this.props.match.params.id;
   }
   isPureAritleField = (fieldName: string): boolean => {
-    return fieldName !== "keys" && !_.startsWith(fieldName, event_prefix);
+    return (
+      fieldName !== "keys" &&
+      fieldName !== "timer" &&
+      !_.startsWith(fieldName, event_prefix)
+    );
   };
   idArticleEvent = (fieldName: string): boolean => {
     return _.startsWith(fieldName, event_prefix);
@@ -94,6 +121,9 @@ class AritcleEditor extends PureComponent {
     force: boolean = false
   ): any => {
     return e => {
+      if (e.keyCode !== 32) {
+        return;
+      }
       if (this.deletedEventIds.indexOf(eventKey) !== -1) {
         return;
       }
@@ -153,7 +183,7 @@ class AritcleEditor extends PureComponent {
         func: this.onValuesChange,
         args: [props, values, articleNode]
       });
-      console.log(this.tasks, this.tasks.length, force);
+      // console.log(this.tasks, this.tasks.length, force);
       if (this.tasks.length > 1 && !force) {
         return;
       }
@@ -213,7 +243,8 @@ class AritcleEditor extends PureComponent {
     };
   };
   dropTask = () => {
-    console.log("this.tasks.length = ", this.tasks.length);
+    // console.log("this.tasks.length = ", this.tasks.length);
+    this.consoleState();
     this.tasks = _.drop(this.tasks, 1);
     if (this.tasks.length > 0) {
       var { func, args } = this.tasks[0];

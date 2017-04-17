@@ -46,6 +46,7 @@ class EditForm extends React.Component {
   handleSubmit: (e: Object) => void;
   remove: (k: any) => void;
   add: () => void;
+  timerID: any;
 
   constructor(props) {
     super(props);
@@ -54,12 +55,34 @@ class EditForm extends React.Component {
     this.remove = this.remove.bind(this);
     this.add = this.add.bind(this);
   }
+  // componentDidMount() {
+  //   this.timerID = setInterval(() => {
+  //     // console.log("timer is running");
+  //     this.props.form.setFieldsValue({
+  //       timer: Math.random()
+  //     });
+  //   }, 5000);
+  // }
+  // componentWillUnmount() {
+  //   // console.log("timer is removed");
+  //   clearInterval(this.timerID);
+  // }
+  onKeyUp = e => {
+    console.log(e.keyCode);
+    if (e.keyCode === 32) {
+      this.props.form.setFieldsValue({
+        timer: Math.random()
+      });
+    }
+  };
   handleSubmit(e) {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
         // console.log("Received values of form: ", values);
         this.props.handleSubmit(values, this.props.node);
+      } else {
+        console.log(err);
       }
     });
   }
@@ -146,6 +169,9 @@ class EditForm extends React.Component {
     getFieldDecorator("keys", {
       initialValue: edges.map(_node => _node.node.id)
     });
+    getFieldDecorator("timer", {
+      initialValue: Math.random()
+    });
     const keys = getFieldValue("keys");
     const formItems = keys.map((k, index) => {
       // console.log(k, "99999999999999999999999999");
@@ -157,11 +183,11 @@ class EditForm extends React.Component {
           getFieldDecorator={getFieldDecorator}
           label="重要事件"
           prefix="event_"
-          onblur={this.props.onEventInputBlur}
           getFieldValue={getFieldValue}
           defaultValue={this.getEventItemDefaultValue(k, index)}
           k={k}
           key={k}
+          onKeyUp={this.props.onEventInputBlur}
           length={keys.length}
           remove={this.remove}
           placeholder="请填写案例人物的重要事件"
@@ -193,7 +219,7 @@ class EditForm extends React.Component {
           formItemLayout={formItemLayout}
           getFieldDecorator={getFieldDecorator}
           label="类别"
-          defaultValue={categories}
+          defaultValue={categories ? categories : undefined}
           fieldName="categories"
           showSearch={true}
           placeholder="请选择案例类别"
@@ -260,7 +286,7 @@ class EditForm extends React.Component {
           label="职业"
           fieldName="jobs"
           showSearch={true}
-          defaultValue={jobs}
+          defaultValue={jobs ? jobs : undefined}
           message="人物职业不能为空"
           placeholder="请选择案例人物职业"
           edges={master.jobs.edges}
@@ -277,6 +303,7 @@ class EditForm extends React.Component {
           edges={master.marriages.edges}
         />
         <Textarea
+          onKeyUp={this.onKeyUp}
           label="子女"
           placeholder="子女信息(可以不填)"
           fieldName="children"
@@ -292,6 +319,7 @@ class EditForm extends React.Component {
           </Button>
         </FormItem>
         <Textarea
+          onKeyUp={this.onKeyUp}
           label="命理知识备注"
           placeholder="请填写命理知识备注(可以不填)"
           fieldName="knowledge"

@@ -1,14 +1,15 @@
 // @flow
 
 import React, { Component } from "react";
-import { Button, Icon, Form, Input } from "antd";
+import { Icon, message } from "antd";
 import { withRouter, Link } from "react-router-dom";
-const FormItem = Form.Item;
+import Relay from "react-relay";
 import SectionTitle from "../SectionTitle";
-
+import NoteMutation from "./mutation";
 import RelayLoading from "../RelayLoading";
 import NodeQueryConfig from "../../queryConfig/NodeQueryConfig";
 import { DetailContainer } from "../ArticleDetail";
+import NoteForm from "./NoteForm";
 
 const styles = {
   icon: {
@@ -17,9 +18,11 @@ const styles = {
 };
 class DetailPage extends Component {
   back: () => void;
+  clearTextarea: any;
   constructor(props) {
     super(props);
     this.back = this.back.bind(this);
+    this.clearTextarea = null;
   }
   componentDidMount() {
     window.scrollTo(0, 0);
@@ -27,8 +30,44 @@ class DetailPage extends Component {
   back() {
     this.props.history.goBack();
   }
+  onFailure = (transaction: Relay.RelayMutationTransaction): void => {
+    message.error("error !", 2);
+    if (this.clearTextarea) {
+      // this.clearTextarea();
+      this.clearTextarea = null;
+    }
+  };
+  onSuccess = (response: Object): void => {
+    message.success("success !", 2);
+    if (this.clearTextarea) {
+      this.clearTextarea();
+      this.clearTextarea = null;
+    }
+  };
+  doMutation = (input: Object): void => {
+    this.props.relay.commitUpdate(new NoteMutation(input), {
+      onFailure: this.onFailure,
+      onSuccess: this.onSuccess
+    });
+  };
+  handleSubmit = (values, callback) => {
+    this.doMutation({
+      text: values.text,
+      node: this.props.node
+    });
+    this.clearTextarea = callback;
+  };
+  removeNote = (noteId: string): any => {
+    return () => {
+      this.doMutation({
+        noteId,
+        node: this.props.node
+      });
+    };
+  };
   render() {
-    const { match: { params: { id } } } = this.props;
+    // console.log(this.props.node);
+    const { node: { id } } = this.props;
     return (
       <div>
         <SectionTitle
@@ -49,9 +88,10 @@ class DetailPage extends Component {
           }
         />
         <section className="filter-box">
-          <RelayLoading route={new NodeQueryConfig({ id })}>
-            <DetailContainer />
-          </RelayLoading>
+          <DetailContainer
+            removeNote={this.removeNote}
+            node={this.props.node}
+          />
           <SectionTitle
             icon="link"
             text="追加备注"
@@ -63,14 +103,7 @@ class DetailPage extends Component {
             }}
           />
           <div>
-            <Form layout="vertical">
-              <FormItem>
-                <Input type="textarea" />
-              </FormItem>
-              <FormItem style={{ textAlign: "right" }}>
-                <Button type="primary">保存</Button>
-              </FormItem>
-            </Form>
+            <NoteForm handleSubmit={this.handleSubmit} />
           </div>
         </section>
       </div>
@@ -78,4 +111,27 @@ class DetailPage extends Component {
   }
 }
 
-export default withRouter(DetailPage);
+const Container = Relay.createContainer(withRouter(DetailPage), {
+  fragments: {
+    node: () => Relay.QL`
+        fragment on Article {
+          id,
+          ${NoteMutation.getFragment("node")}
+          ${DetailContainer.getFragment("node")}
+        }
+      `
+  }
+});
+
+class DetailPageContainer extends Component {
+  render() {
+    const { match: { params: { id } } } = this.props;
+    return (
+      <RelayLoading route={new NodeQueryConfig({ id })}>
+        <Container />
+      </RelayLoading>
+    );
+  }
+}
+
+export default DetailPageContainer;

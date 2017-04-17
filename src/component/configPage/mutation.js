@@ -81,7 +81,7 @@ function getAddconfigs(type: string, masterId: string) {
       connectionName: "dic",
       edgeName: "newEdge",
       rangeBehaviors: (ast: any) => {
-        console.log(ast);
+        // console.log(ast);
         if (ast.code === type) {
           return "append";
         } else {

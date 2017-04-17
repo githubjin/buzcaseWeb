@@ -4,7 +4,7 @@ class NodeQueryConfig extends Relay.Route {}
 NodeQueryConfig.routeName = "NodeQueryConfig";
 NodeQueryConfig.paramDefinitions = {
   id: { required: true },
-  idIsNew: false
+  idIsNew: true
 };
 NodeQueryConfig.prepareParams = prevParams => {
   return {

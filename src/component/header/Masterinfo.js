@@ -64,7 +64,7 @@ class Masterinfo extends React.PureComponent {
     );
     const master = this.getMaster();
     return (
-      <Dropdown overlay={menu}>
+      <Dropdown overlay={menu} trigger={["click"]}>
         <a className="ant-dropdown-link">
           你好，{master.username} <Icon type="down" />
         </a>

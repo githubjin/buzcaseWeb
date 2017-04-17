@@ -1,4 +1,4 @@
-// @relay
+// @flow
 import Relay from "react-relay";
 
 export default class DraftsMutation extends Relay.Mutation {

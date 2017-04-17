@@ -16,14 +16,15 @@ module.exports = (props: any) => {
     required,
     message,
     placeholder,
-    defaultValue = ""
+    defaultValue = "",
+    onBlur
   } = props;
   return (
     <FormItem hasFeedback {...formItemLayout} label={label}>
       {getFieldDecorator(fieldName, {
         rules: required ? getRoles(message) : emptyRoles,
         initialValue: defaultValue
-      })(<Input placeholder={placeholder} />)}
+      })(<Input onBlur={onBlur} placeholder={placeholder} />)}
     </FormItem>
   );
 };

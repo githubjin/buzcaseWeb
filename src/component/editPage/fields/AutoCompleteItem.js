@@ -18,7 +18,8 @@ module.exports = (props: any) => {
     edges,
     message,
     required = true,
-    defaultValue = ""
+    defaultValue = "",
+    onBlur
   } = props;
   return (
     <FormItem {...formItemLayout} label={label} hasFeedback>
@@ -27,6 +28,7 @@ module.exports = (props: any) => {
         initialValue: defaultValue
       })(
         <AutoComplete
+          onBlur={onBlur}
           dataSource={edges
             .filter(edge => edge.node.order !== 0)
             .map(edge => edge.node.name)}
