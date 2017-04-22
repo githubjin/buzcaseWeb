@@ -3,8 +3,8 @@ import Relay from "react-relay";
 
 export default class DraftsMutation extends Relay.Mutation {
   static fragments = {
-    master: () => Relay.QL`
-        fragment on MasterType {
+    viewer: () => Relay.QL`
+        fragment on User {
         id
     }
     `
@@ -18,7 +18,7 @@ export default class DraftsMutation extends Relay.Mutation {
     return Relay.QL`
         fragment on DraftMutationPayload {
             distroyedId,
-            master {
+            viewer {
                 articles
             },
             error
@@ -29,8 +29,8 @@ export default class DraftsMutation extends Relay.Mutation {
     return [
       {
         type: "NODE_DELETE",
-        parentName: "master",
-        parentID: this.props.master.id,
+        parentName: "viewer",
+        parentID: this.props.viewer.id,
         connectionName: "articles",
         deletedIDFieldName: "distroyedId"
       }

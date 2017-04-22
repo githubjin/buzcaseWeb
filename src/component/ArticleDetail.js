@@ -174,8 +174,40 @@ export default class ArticleDetail extends Component {
       });
     };
   };
+  renderNameAndTitle = () => {
+    const article = this.props.article || this.props.node;
+    const { name, title, gender, homePlace, birthday, categories } = article;
+    return (
+      <div>
+        <Row style={{ ...styles.itemPadding, ...{ paddingTop: 1 } }}>
+          <Col span={2}><strong>标题：</strong> </Col>
+          <Col span={10}>{title}</Col>
+          <Col span={2}><strong>类型：</strong> </Col>
+          <Col span={10}>{categories.join(" · ")}</Col>
+        </Row>
+        <Row style={{ ...styles.itemPadding, ...{ paddingTop: 1 } }}>
+          <Col span={2}><strong>姓名：</strong> </Col>
+          <Col span={10}>{name}</Col>
+          <Col span={2}><strong>性别：</strong> </Col>
+          <Col span={10}>{gender}</Col>
+        </Row>
+        <Row style={{ ...styles.itemPadding, ...{ paddingTop: 1 } }}>
+          <Col span={2}><strong>出生日期：</strong> </Col>
+          <Col span={10}>{moment(birthday).format("YYYY-MM-DD hh:mm")}</Col>
+          <Col span={2}><strong>出生地点：</strong> </Col>
+          <Col
+            span={10}
+          >{`${homePlace.province}${homePlace.city}${homePlace.area}`}</Col>
+        </Row>
+      </div>
+    );
+  };
   render() {
-    const { affix = false, removeNote = () => () => {} } = this.props;
+    const {
+      affix = false,
+      removeNote = () => () => {},
+      showAll = false
+    } = this.props;
     const article = this.props.article || this.props.node;
     const {
       attachments,
@@ -198,13 +230,14 @@ export default class ArticleDetail extends Component {
         style={{ marginTop: 10, fontSize: 14, lineHeight: 1.7, color: "#000" }}
       >
         {this.renderImages(attachments)}
-        <Row style={{ ...styles.itemPadding, ...{ paddingTop: 5 } }}>
+        {showAll && this.renderNameAndTitle()}
+        <Row style={{ ...styles.itemPadding, ...{ paddingTop: 1 } }}>
           <Col span={2}><strong>学历：</strong> </Col>
           <Col span={10}>{education}</Col>
           <Col span={2}><strong>职业：</strong> </Col>
-          <Col span={10}>{!_.isEmpty(jobs) && jobs.join("，")}</Col>
+          <Col span={10}>{!_.isEmpty(jobs) && jobs.join(" · ")}</Col>
         </Row>
-        <Row style={{ ...styles.itemPadding, ...{ paddingTop: 5 } }}>
+        <Row style={{ ...styles.itemPadding, ...{ paddingTop: 1 } }}>
           <Col span={2}><strong>婚姻：</strong> </Col>
           <Col span={10}>{marriage} </Col>
           <Col span={2}><strong>子女：</strong> </Col>
@@ -331,7 +364,8 @@ export default class ArticleDetail extends Component {
 
 ArticleDetail.propTypes = {
   affix: PropTypes.bool,
-  affixHandler: PropTypes.func
+  affixHandler: PropTypes.func,
+  showAll: PropTypes.bool
 };
 
 export const DetailContainer = Relay.createContainer(ArticleDetail, {

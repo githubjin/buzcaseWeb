@@ -40,12 +40,18 @@ export default class FilteredList extends PureComponent {
     });
   }
   render() {
-    const { articles: { totalInfo, edges } } = this.props;
+    const { viewer: { articles: { totalInfo, edges } } } = this.props;
     const { affixed } = this.state;
     return (
       <section className="filter-list">
         {edges.map(edge => {
-          return <ArticleItem key={edge.node.id} article={edge.node} />;
+          return (
+            <ArticleItem
+              key={edge.node.id}
+              article={edge.node}
+              deleteArticle={this.props.deleteArticle}
+            />
+          );
         })}
         <Affix offsetBottom={2} onChange={this.onAffixChange.bind(this)}>
           <Row

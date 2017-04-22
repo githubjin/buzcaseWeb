@@ -6,15 +6,16 @@ import _ from "lodash";
 import styled from "styled-components";
 import FilterBox from "./FilterBox";
 import FilteredList from "./FilteredList";
-import { Row, Col, Icon } from "antd";
+import { Row, Col, Icon, message } from "antd";
 import DicPoolRoute from "../../queryConfig";
 import RelayLoading from "../RelayLoading";
+import DelMutation from "./mutation";
 
 const FilterBoxLoading = styled.div`
   width: 960px;
   height: 416px;
 `;
-class HomePage extends React.Component {
+class HomePage extends React.PureComponent {
   goPage: (page: number, pageSize: number) => void;
   state: {
     page: number,
@@ -49,9 +50,34 @@ class HomePage extends React.Component {
       page: 1
     });
   }
+  onFailure = (transaction: Relay.RelayMutationTransaction): void => {
+    message.error("案例未删除成功！", 2);
+  };
+  onSuccess = (response: Object): void => {
+    // console.log(response);
+    let { ArticleDeleteMutation: { error } = {} } = response;
+    if (!error) {
+      message.success("案例已删除", 2);
+    } else {
+      message.error("案例未删除成功！", 2);
+    }
+  };
+  deleteArticle = (id: string): any => {
+    return () => {
+      Relay.Store.commitUpdate(
+        new DelMutation({
+          articleId: id,
+          viewer: this.props.viewer
+        }),
+        {
+          onFailure: this.onFailure,
+          onSuccess: this.onSuccess
+        }
+      );
+    };
+  };
   render() {
-    const { master: { articles } } = this.props;
-    // console.log(articles);
+    const { viewer } = this.props;
     return (
       <div>
         <Row>
@@ -74,7 +100,11 @@ class HomePage extends React.Component {
             </span>
           </Col>
         </Row>
-        <FilteredList goPage={this.goPage.bind(this)} articles={articles} />
+        <FilteredList
+          deleteArticle={this.deleteArticle}
+          goPage={this.goPage.bind(this)}
+          viewer={viewer}
+        />
       </div>
     );
   }
@@ -88,8 +118,10 @@ const Container = Relay.createContainer(HomePage, {
     conditions: {}
   },
   fragments: {
-    master: () => Relay.QL`
-      fragment on MasterType {
+    viewer: () => Relay.QL`
+      fragment on User {
+        id,
+        ${DelMutation.getFragment("viewer")}
         articles(page: $page, pageSize: $pageSize, sorters: $sorters, first: $pageSize, conditions: $conditions){
           totalInfo {
             total,

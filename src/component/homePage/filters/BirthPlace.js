@@ -11,7 +11,7 @@ class BirthPlace extends React.PureComponent {
         <ChinaDivision
           matchInputWidth={true}
           relay={this.props.relay}
-          master={this.props.master}
+          viewer={this.props.viewer}
           doSearch={this.props.doSearch}
         />
       </div>
@@ -26,8 +26,8 @@ BirthPlace.propTypes = {
 module.exports = Relay.createContainer(BirthPlace, {
   initialVariables: { provinceCode: "0", cityCode: "0" },
   fragments: {
-    master: () => Relay.QL`
-      fragment on MasterType {
+    viewer: () => Relay.QL`
+      fragment on User {
         provinces: provinces(first: 50){
           edges {
             node {

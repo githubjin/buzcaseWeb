@@ -123,10 +123,10 @@ class Complete extends React.PureComponent {
   };
   // shouldComponentUpdate(nextProps, nextState) {
   //   const {
-  //     master: { autocomplete: { names = [], titles = [] } = {} }
+  //     viewer: { autocomplete: { names = [], titles = [] } = {} }
   //   } = this.props;
   //   const {
-  //     master: {
+  //     viewer: {
   //       autocomplete: { names: namesNext = [], titles: titlesNext = [] } = {}
   //     }
   //   } = nextProps;
@@ -141,9 +141,9 @@ class Complete extends React.PureComponent {
   render() {
     // console.log("e.keyCode is ", e.keyCode, e.target.value);
     const {
-      master: { autocomplete: { names = [], titles = [] } = {} }
+      viewer: { autocomplete: { names = [], titles = [] } = {} }
     } = this.props;
-    // console.log(this.props.master);
+    // console.log(this.props.viewer);
     const isVisible =
       this.state.isVisible && (names.length > 0 || titles.length > 0);
     return (
@@ -185,8 +185,8 @@ const Container = Relay.createContainer(Complete, {
     };
   },
   fragments: {
-    master: () => Relay.QL`
-    fragment on MasterType {
+    viewer: () => Relay.QL`
+    fragment on User {
       autocomplete(token: $token, size:$size) @skip(if: $skip) {
         names {
           article

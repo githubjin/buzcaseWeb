@@ -1,7 +1,7 @@
 // @flw
 import React, { PureComponent } from "react";
 
-import { Row, Col, Icon } from "antd";
+import { Row, Col, Icon, Popconfirm } from "antd";
 import { withRouter, Link } from "react-router-dom";
 import _ from "lodash";
 import moment from "moment";
@@ -136,9 +136,16 @@ class ArticleItem extends PureComponent {
             </Link>
           </Col>
           <Col span={2} style={styles.bnt}>
-            <a href="#" className="meta-item meta-item-danger">
-              <Icon type="delete" style={styles.rightTopIcon} />删除
-            </a>
+            <Popconfirm
+              title="确定删除吗？删除后无法恢复！"
+              okText="是"
+              cancelText="否"
+              onConfirm={this.props.deleteArticle(id)}
+            >
+              <a href="#" className="meta-item meta-item-danger">
+                <Icon type="delete" style={styles.rightTopIcon} />删除
+              </a>
+            </Popconfirm>
           </Col>
         </Row>
         <Row style={styles.title}>

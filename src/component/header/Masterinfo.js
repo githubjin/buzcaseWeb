@@ -11,13 +11,13 @@ import { logout, getUser } from "../../util";
 
 // `;
 class Masterinfo extends React.PureComponent {
-  state: { master: Object };
+  state: { viewer: Object };
   getUserInfoFromLocal: () => void;
   getMaster: () => Object;
   constructor(props) {
     super(props);
     this.state = {
-      master: {}
+      viewer: {}
     };
     this.getUserInfoFromLocal = this.getUserInfoFromLocal.bind(this);
     this.getMaster = this.getMaster.bind(this);
@@ -25,20 +25,20 @@ class Masterinfo extends React.PureComponent {
   getUserInfoFromLocal() {
     var user = getUser();
     if (!_.isEmpty(user)) {
-      var master = JSON.parse(user);
-      this.setState({ master });
+      var viewer = JSON.parse(user);
+      this.setState({ viewer });
     }
   }
   componentDidMount() {
-    if (_.isEmpty(this.props.master.username)) {
+    if (_.isEmpty(this.props.viewer.username)) {
       this.getUserInfoFromLocal();
     }
   }
   getMaster() {
-    if (_.isEmpty(this.props.master.username)) {
-      return this.state.master;
+    if (_.isEmpty(this.props.viewer.username)) {
+      return this.state.viewer;
     }
-    return this.props.master;
+    return this.props.viewer;
   }
   _logout = () => {
     logout(() => this.props.history.push("/signin"));
@@ -62,11 +62,11 @@ class Masterinfo extends React.PureComponent {
         </Menu.Item>
       </Menu>
     );
-    const master = this.getMaster();
+    const viewer = this.getMaster();
     return (
       <Dropdown overlay={menu} trigger={["click"]}>
         <a className="ant-dropdown-link">
-          你好，{master.username} <Icon type="down" />
+          你好，{viewer.username} <Icon type="down" />
         </a>
       </Dropdown>
     );
@@ -75,8 +75,8 @@ class Masterinfo extends React.PureComponent {
 
 module.exports = Relay.createContainer(withRouter(Masterinfo), {
   fragments: {
-    master: () => Relay.QL`
-      fragment on MasterType {
+    viewer: () => Relay.QL`
+      fragment on User {
         id,
         username,
         sessionToken,

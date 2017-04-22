@@ -41,9 +41,9 @@ class SignPage extends PureComponent {
   }
   onSuccess(res) {
     var sign = res.signUp || res.signIn;
-    var { error, master } = sign;
+    var { error, viewer } = sign;
     if (!error) {
-      setToken(master, () => {
+      setToken(viewer, () => {
         // console.log("withRoute is ok ? ", this.props);
         this.props.history.push("/");
       });
@@ -57,7 +57,7 @@ class SignPage extends PureComponent {
   handleSubmit(values, isSignUp) {
     var _Mutation = isSignUp ? SignUpMutation : SignInMutation;
     Relay.Store.commitUpdate(
-      new _Mutation({ ...values, master: this.props.master }),
+      new _Mutation({ ...values, viewer: this.props.viewer }),
       {
         onFailure: this.onFailure.bind(this),
         onSuccess: this.onSuccess.bind(this)
@@ -65,7 +65,7 @@ class SignPage extends PureComponent {
     );
   }
   render() {
-    console.log(this.props.master);
+    console.log(this.props.viewer);
     const { pathname } = this.props.location;
     return (
       <Wraper id="signtab">
@@ -90,7 +90,7 @@ class SignPage extends PureComponent {
               <SignUpPanel
                 handleSubmit={this.handleSubmit.bind(this)}
                 {...props}
-                master={this.props.master}
+                viewer={this.props.viewer}
               />
             )}
           />
@@ -100,7 +100,7 @@ class SignPage extends PureComponent {
               <SignInPanel
                 handleSubmit={this.handleSubmit.bind(this)}
                 {...props}
-                master={this.props.master}
+                viewer={this.props.viewer}
               />
             )}
           />
@@ -112,10 +112,10 @@ class SignPage extends PureComponent {
 
 module.exports = Relay.createContainer(withRouter(SignPage), {
   fragments: {
-    master: () => Relay.QL`
-      fragment on MasterType {
+    viewer: () => Relay.QL`
+      fragment on User {
         id
-        ${SignUpMutation.getFragment("master")}
+        ${SignUpMutation.getFragment("viewer")}
       }
     `
   }

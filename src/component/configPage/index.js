@@ -32,13 +32,13 @@ const BoxTitleText = styled.a`
 class ConfigPage extends React.PureComponent {
   add = (type: string, name: string, order: number): void => {
     this.props.relay.commitUpdate(
-      new DictionaryMutation({ master: this.props.master, type, name, order }),
+      new DictionaryMutation({ viewer: this.props.viewer, type, name, order }),
       { onFailure: this.onFailure, onSuccess: this.onSuccess }
     );
   };
   deleteTag = (type: string, nodeId: string): void => {
     this.props.relay.commitUpdate(
-      new DictionaryMutation({ master: this.props.master, type, id: nodeId }),
+      new DictionaryMutation({ viewer: this.props.viewer, type, id: nodeId }),
       { onFailure: this.onFailure, onSuccess: this.onSuccess }
     );
   };
@@ -53,7 +53,7 @@ class ConfigPage extends React.PureComponent {
   render() {
     console.log(this.props);
     const {
-      master: { categories, educations, jobs, genders, marriages }
+      viewer: { categories, educations, jobs, genders, marriages }
     } = this.props;
     return (
       <div>
@@ -122,9 +122,9 @@ class ConfigPage extends React.PureComponent {
 
 export var ConfigPageContainer = Relay.createContainer(ConfigPage, {
   fragments: {
-    master: () => Relay.QL`
-      fragment on MasterType {
-        ${DictionaryMutation.getFragment("master")}
+    viewer: () => Relay.QL`
+      fragment on User {
+        ${DictionaryMutation.getFragment("viewer")}
         jobs:dic(code: "Job", first: 99999) {
           edges {
             node {

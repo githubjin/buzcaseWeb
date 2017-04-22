@@ -22,7 +22,7 @@ const jobFatQuery = Relay.QL`
     fragment on JobMutationPayload {
         newEdge,
         distroyedId,
-        master {
+        viewer {
             dic
         }
         error
@@ -32,7 +32,7 @@ const genderFatQuery = Relay.QL`
     fragment on GenderMutationPayload {
         newEdge,
         distroyedId,
-        master {
+        viewer {
             dic
         }
         error
@@ -42,7 +42,7 @@ const categoryFatQuery = Relay.QL`
     fragment on CategoryMutationPayload {
         newEdge,
         distroyedId,
-        master {
+        viewer {
             dic
         }
         error
@@ -52,7 +52,7 @@ const educationFatQuery = Relay.QL`
     fragment on EducationMutationPayload {
         newEdge,
         distroyedId,
-        master {
+        viewer {
             dic
         }
         error
@@ -62,22 +62,22 @@ const marriageFatQuery = Relay.QL`
     fragment on MarriageMutationPayload {
         newEdge,
         distroyedId,
-        master {
+        viewer {
             dic
         }
         error
     }
 `;
 // configs
-function getAddconfigs(type: string, masterId: string) {
+function getAddconfigs(type: string, viewerId: string) {
   var prefix = `code("${type}").first(99999)`;
   var rangeBehaviors = { "": "ignore" };
   rangeBehaviors[prefix] = "append";
   return [
     {
       type: "RANGE_ADD",
-      parentName: "master",
-      parentID: masterId,
+      parentName: "viewer",
+      parentID: viewerId,
       connectionName: "dic",
       edgeName: "newEdge",
       rangeBehaviors: (ast: any) => {
@@ -91,12 +91,12 @@ function getAddconfigs(type: string, masterId: string) {
     }
   ];
 }
-function getSubConfig(masterId: string) {
+function getSubConfig(viewerId: string) {
   return [
     {
       type: "NODE_DELETE",
-      parentName: "master",
-      parentID: masterId,
+      parentName: "viewer",
+      parentID: viewerId,
       connectionName: "dic",
       deletedIDFieldName: "distroyedId"
     }
@@ -105,8 +105,8 @@ function getSubConfig(masterId: string) {
 
 export default class DictionaryMutation extends Relay.Mutation {
   static fragments = {
-    master: () => Relay.QL`
-        fragment on MasterType {
+    viewer: () => Relay.QL`
+        fragment on User {
         id
     }
     `
@@ -145,9 +145,9 @@ export default class DictionaryMutation extends Relay.Mutation {
   }
   getConfigs() {
     if (this.props.id) {
-      return getSubConfig(this.props.master.id);
+      return getSubConfig(this.props.viewer.id);
     } else {
-      return getAddconfigs(this.props.type, this.props.master.id);
+      return getAddconfigs(this.props.type, this.props.viewer.id);
     }
   }
   getVariables() {

@@ -30,17 +30,17 @@ class App extends PureComponent {
         <Switch>
           <Route
             path="/signin"
-            render={props => <SignPage master={this.props.master} {...props} />}
+            render={props => <SignPage viewer={this.props.viewer} {...props} />}
           />
           <Route
             path="/signup"
-            render={props => <SignPage master={this.props.master} {...props} />}
+            render={props => <SignPage viewer={this.props.viewer} {...props} />}
           />
           <Route
             path="/"
             render={() => (
               <Layout style={{ minWidth: 960 }}>
-                <Header master={this.props.master} />
+                <Header viewer={this.props.viewer} />
                 <Content
                   className="App-content-wrap"
                   style={{ background: "#fff" }}
@@ -86,10 +86,10 @@ class App extends PureComponent {
 
 module.exports = Relay.createContainer(App, {
   fragments: {
-    master: () => Relay.QL`
-      fragment on MasterType {
-        ${Masterinfo.getFragment("master")}
-        ${SignPage.getFragment("master")}
+    viewer: () => Relay.QL`
+      fragment on User {
+        ${Masterinfo.getFragment("viewer")}
+        ${SignPage.getFragment("viewer")}
       }
     `
   }

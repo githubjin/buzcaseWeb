@@ -15,19 +15,19 @@ import _ from "lodash";
 
 type EmptyFunc = () => void;
 
-// save master to localstorage
-export function setToken(master: Object, callback: EmptyFunc) {
-  window.localStorage.setItem(buzcaseUserKey, JSON.stringify(master));
+// save viewer to localstorage
+export function setToken(viewer: Object, callback: EmptyFunc) {
+  window.localStorage.setItem(buzcaseUserKey, JSON.stringify(viewer));
   callback();
 }
 
-// get master from localstorage
+// get viewer from localstorage
 export function getToken(): string {
-  var master = window.localStorage.getItem(buzcaseUserKey);
-  if (_.isEmpty(master)) {
+  var viewer = window.localStorage.getItem(buzcaseUserKey);
+  if (_.isEmpty(viewer)) {
     return "";
   }
-  return JSON.parse(master).sessionToken;
+  return JSON.parse(viewer).sessionToken;
 }
 
 // init relay network layer

@@ -35,7 +35,7 @@ const formItemLayoutWithOutLabel = {
 
 class EditForm extends React.Component {
   props: {
-    master: Object,
+    viewer: Object,
     node: Object,
     form: Object,
     onEventInputDelete: (id: number) => void,
@@ -149,7 +149,7 @@ class EditForm extends React.Component {
     return currentNode[0].node.text;
   };
   render() {
-    const { master, node = {} } = this.props;
+    const { viewer, node = {} } = this.props;
     const {
       title,
       categories,
@@ -224,7 +224,7 @@ class EditForm extends React.Component {
           showSearch={true}
           placeholder="请选择案例类别"
           message="案例类别不能为空"
-          edges={master.categories.edges}
+          edges={viewer.categories.edges}
         />
         <InputItem
           label="姓名/昵称"
@@ -245,7 +245,7 @@ class EditForm extends React.Component {
           defaultValue={gender}
           message="性别不能为空"
           placeholder="请选择案例人物性别"
-          edges={master.genders.edges}
+          edges={viewer.genders.edges}
         />
         <Birthtime
           formItemLayout={formItemLayout}
@@ -278,7 +278,7 @@ class EditForm extends React.Component {
           showSearch={true}
           message="学历不能为空"
           placeholder="请选择案例人物学历"
-          edges={master.educations.edges}
+          edges={viewer.educations.edges}
         />
         <Tags
           formItemLayout={formItemLayout}
@@ -289,7 +289,7 @@ class EditForm extends React.Component {
           defaultValue={jobs ? jobs : undefined}
           message="人物职业不能为空"
           placeholder="请选择案例人物职业"
-          edges={master.jobs.edges}
+          edges={viewer.jobs.edges}
         />
         <AutoCompleteItem
           formItemLayout={formItemLayout}
@@ -300,7 +300,7 @@ class EditForm extends React.Component {
           showSearch={true}
           message="人物婚姻状况不能为空"
           placeholder="请选择案例人物职业"
-          edges={master.marriages.edges}
+          edges={viewer.marriages.edges}
         />
         <Textarea
           onKeyUp={this.onKeyUp}

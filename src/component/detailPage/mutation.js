@@ -33,10 +33,10 @@ const getSubConfig = parentID => {
   ];
 };
 const getAddConfig = parentID => {
-  console.log(
-    "-------------getConfigs---Add-----------parentID--------",
-    parentID
-  );
+  // console.log(
+  //   "-------------getConfigs---Add-----------parentID--------",
+  //   parentID
+  // );
   return [
     {
       type: "RANGE_ADD",
@@ -73,26 +73,26 @@ export default class NoteMutation extends Relay.Mutation {
   }
   getFatQuery() {
     if (this.props.noteId) {
-      console.log("------------getFatQuery----Sub-------------------");
+      // console.log("------------getFatQuery----Sub-------------------");
       return SubFatQuery;
     } else {
-      console.log("-----------getFatQuery-----Add-------------------");
+      // console.log("-----------getFatQuery-----Add-------------------");
       return AddFatQuery;
     }
   }
   getConfigs() {
-    console.log("this.props", this.props);
+    // console.log("this.props", this.props);
     if (this.props.noteId) {
-      console.log(
-        "----------getConfigs------Sub-------------------",
-        this.props.node.id
-      );
+      // console.log(
+      //   "----------getConfigs------Sub-------------------",
+      //   this.props.node.id
+      // );
       return getSubConfig(this.props.node.id);
     } else {
-      console.log(
-        "-------------getConfigs---Add-------------------",
-        this.props.node.id
-      );
+      // console.log(
+      //   "-------------getConfigs---Add-------------------",
+      //   this.props.node.id
+      // );
       return getAddConfig(this.props.node.id);
     }
   }

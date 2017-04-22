@@ -4,8 +4,8 @@ import Relay from "react-relay";
 
 export default class SignUpMutation extends Relay.Mutation {
   static fragments = {
-    master: () => Relay.QL`
-        fragment on MasterType {
+    viewer: () => Relay.QL`
+        fragment on User {
             id,
             username,
             email,
@@ -22,7 +22,7 @@ export default class SignUpMutation extends Relay.Mutation {
     return Relay.QL`
         fragment on SignUpPayload {
             error,
-            master {
+            viewer {
                 id,
                 username,
                 email,
@@ -43,7 +43,7 @@ export default class SignUpMutation extends Relay.Mutation {
     return [
       {
         type: "FIELDS_CHANGE",
-        fieldIDs: { master: this.props.master.id }
+        fieldIDs: { viewer: this.props.viewer.id }
       },
       {
         type: "REQUIRED_CHILDREN",

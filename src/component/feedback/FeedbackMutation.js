@@ -4,8 +4,8 @@ import Relay from "react-relay";
 
 export default class FeedbackMutation extends Relay.Mutation {
   static fragments = {
-    master: () => Relay.QL`
-      fragment on MasterType {
+    viewer: () => Relay.QL`
+      fragment on User {
         id
       }
     `
@@ -20,7 +20,7 @@ export default class FeedbackMutation extends Relay.Mutation {
       fragment on AddFeedbackPayload {
         newEdge,
         error,
-        master {
+        viewer {
           feedbacks
         }
       }
@@ -30,8 +30,8 @@ export default class FeedbackMutation extends Relay.Mutation {
     return [
       {
         type: "RANGE_ADD",
-        parentName: "master",
-        parentID: this.props.master.id,
+        parentName: "viewer",
+        parentID: this.props.viewer.id,
         connectionName: "feedbacks",
         edgeName: "newEdge",
         rangeBehaviors: (calls: Object) => {
@@ -59,8 +59,8 @@ export default class FeedbackMutation extends Relay.Mutation {
           isPublic: this.props.isPublic
         }
       },
-      master: {
-        id: this.props.master.id,
+      viewer: {
+        id: this.props.viewer.id,
         feedbacks: {
           totalInfo: {
             total: this.props.total + 1

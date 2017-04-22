@@ -5,8 +5,8 @@ import DictDropdown from "./DictDropdown";
 
 export default Relay.createContainer(DictDropdown, {
   fragments: {
-    master: () => Relay.QL`
-        fragment on MasterType {
+    viewer: () => Relay.QL`
+        fragment on User {
           dic(code: "Marriage", first: 99999) {
             edges {
               node{

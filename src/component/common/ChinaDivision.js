@@ -76,7 +76,7 @@ export default class BirthPlace extends React.PureComponent {
     }
   };
   provinceFormat() {
-    const { master: { provinces: { edges } } } = this.props;
+    const { viewer: { provinces: { edges } } } = this.props;
     // console.log(cities, areas, "00120-0-120120-120-20-12001-20-21210-");
     let provinces = edges.map(edge => ({
       value: edge.node.name,
@@ -88,7 +88,7 @@ export default class BirthPlace extends React.PureComponent {
     return provinces;
   }
   subArea(isCity: boolean = true) {
-    var edges = isCity ? this.props.master.cities : this.props.master.areas;
+    var edges = isCity ? this.props.viewer.cities : this.props.viewer.areas;
     if (!edges || edges.length === 0) {
       return null;
     }
@@ -219,7 +219,7 @@ export default class BirthPlace extends React.PureComponent {
 BirthPlace.propTypes = {
   doSearch: PropTypes.func,
   matchInputWidth: PropTypes.bool.isRequired,
-  master: PropTypes.object.isRequired,
+  viewer: PropTypes.object.isRequired,
   relay: PropTypes.object.isRequired,
   inForm: PropTypes.bool,
   formItemLayout: PropTypes.object,

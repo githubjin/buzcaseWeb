@@ -197,7 +197,7 @@ class AritcleEditor extends PureComponent {
   doMutation = (inputObject: Object, doSubmit: boolean = false) => {
     this.mutating = true;
     if (this.article != null) {
-      inputObject = { ...inputObject, submit: this.article.submit };
+      inputObject = { ...inputObject, submit: doSubmit || this.article.submit };
     }
     this.props.relay.commitUpdate(
       new ArticleMutation({ input: inputObject, doSubmit }),
@@ -482,7 +482,7 @@ class AritcleEditor extends PureComponent {
               handleSubmit={this.handleSubmit}
               onEventInputBlur={this.onEventInputBlur}
               onEventInputDelete={this.onEventInputDelete}
-              master={this.props.master}
+              viewer={this.props.viewer}
               onValuesChange={this.onValuesChange.bind(this)}
             />}
           {id !== "new" &&
@@ -491,7 +491,7 @@ class AritcleEditor extends PureComponent {
                 handleSubmit={this.handleSubmit}
                 onEventInputBlur={this.onEventInputBlur}
                 onEventInputDelete={this.onEventInputDelete}
-                master={this.props.master}
+                viewer={this.props.viewer}
                 onValuesChange={this.onValuesChange.bind(this)}
               />
             </RelayLoading>}
@@ -505,8 +505,8 @@ class AritcleEditor extends PureComponent {
 export var EditorContainer = Relay.createContainer(AritcleEditor, {
   // initialVariables: { provinceCode: "0", cityCode: "0" },
   fragments: {
-    master: () => Relay.QL`
-      fragment on MasterType {
+    viewer: () => Relay.QL`
+      fragment on User {
         jobs:dic(code: "Job", first: 99999) {
           edges {
             node {

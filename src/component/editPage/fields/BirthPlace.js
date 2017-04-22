@@ -18,7 +18,7 @@ class BirthPlaceInForm extends React.PureComponent {
       message,
       placeholder,
       defaultValue,
-      master,
+      viewer,
       relay
     } = this.props;
     return (
@@ -32,7 +32,7 @@ class BirthPlaceInForm extends React.PureComponent {
         defaultValue={defaultValue}
         rules={required ? getRules(message) : emptyRoles}
         matchInputWidth={false}
-        master={master}
+        viewer={viewer}
         relay={relay}
       />
     );
@@ -42,8 +42,8 @@ class BirthPlaceInForm extends React.PureComponent {
 module.exports = Relay.createContainer(BirthPlaceInForm, {
   initialVariables: { provinceCode: "0", cityCode: "0" },
   fragments: {
-    master: () => Relay.QL`
-      fragment on MasterType {
+    viewer: () => Relay.QL`
+      fragment on User {
         provinces: provinces(first: 50){
           edges {
             node {

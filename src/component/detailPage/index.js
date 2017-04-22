@@ -91,6 +91,7 @@ class DetailPage extends Component {
           <DetailContainer
             removeNote={this.removeNote}
             node={this.props.node}
+            showAll={true}
           />
           <SectionTitle
             icon="link"

@@ -90,7 +90,7 @@ export default class DicFilterItem extends PureComponent {
     }
   }
   render() {
-    const { master: { dic: dict }, title } = this.props;
+    const { viewer: { dic: dict }, title } = this.props;
     // console.log("--------------------------", this.props);
     return (
       <Row>

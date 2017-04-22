@@ -16,12 +16,12 @@ function isAuthenticated() {
   return true;
 }
 
-const PrivateRoute = ({ component, master, ...rest }: any) => (
+const PrivateRoute = ({ component, viewer, ...rest }: any) => (
   <Route
     {...rest}
     render={props =>
       isAuthenticated()
-        ? React.createElement(component, { ...props, master })
+        ? React.createElement(component, { ...props, viewer })
         : <Redirect
             to={{
               pathname: "/signin",

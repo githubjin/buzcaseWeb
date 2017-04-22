@@ -65,13 +65,13 @@ class Feedback extends Component {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         // console.log("Received values of form: ", values);
-        // console.log(this.props.master);
+        // console.log(this.props.viewer);
         this.setState({ saving: true });
         this.props.relay.commitUpdate(
           new AddFeedbackMutation({
             ...values,
-            total: this.props.master.feedbacks.totalInfo.total,
-            master: this.props.master
+            total: this.props.viewer.feedbacks.totalInfo.total,
+            viewer: this.props.viewer
           }),
           {
             onFailure: this.onFailure.bind(this),
@@ -123,7 +123,7 @@ class Feedback extends Component {
     });
   }
   render() {
-    const { master: { feedbacks: { edges, totalInfo } } } = this.props;
+    const { viewer: { feedbacks: { edges, totalInfo } } } = this.props;
     const { getFieldDecorator } = this.props.form;
     const { visible } = this.state;
     // console.log(this.props);
@@ -199,9 +199,9 @@ const Container = Relay.createContainer(Form.create()(Feedback), {
     sorters: [{ order: "createdAt", dir: "DESC" }]
   },
   fragments: {
-    master: () => Relay.QL`
-      fragment on MasterType{
-        ${AddFeedbackMutation.getFragment("master")}
+    viewer: () => Relay.QL`
+      fragment on User{
+        ${AddFeedbackMutation.getFragment("viewer")}
         feedbacks(page: $page, pageSize: $pageSize, sorters: $sorters, first: $pageSize){
           totalInfo{
             pageSize

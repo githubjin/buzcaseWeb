@@ -89,7 +89,7 @@ class Drafts extends React.PureComponent {
     return () => {
       this.props.relay.commitUpdate(
         new DraftMutation({
-          master: this.props.master,
+          viewer: this.props.viewer,
           order: index,
           id: articleId
         }),
@@ -104,7 +104,7 @@ class Drafts extends React.PureComponent {
     message.success("success !", 2);
   };
   render() {
-    const { master: { articles: { edges } } } = this.props;
+    const { viewer: { articles: { edges } } } = this.props;
     // console.log(edges);
     return (
       <div>
@@ -161,9 +161,9 @@ var DraftsContainer = Relay.createContainer(Drafts, {
     conditions: { submit: false }
   },
   fragments: {
-    master: () => Relay.QL`
-      fragment on MasterType {
-        ${DraftMutation.getFragment("master")}
+    viewer: () => Relay.QL`
+      fragment on User {
+        ${DraftMutation.getFragment("viewer")}
         articles(page: $page, pageSize: $pageSize, sorters: $sorters, first: $pageSize, conditions: $conditions){
           totalInfo {
             total,

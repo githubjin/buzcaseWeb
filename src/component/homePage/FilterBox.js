@@ -38,14 +38,14 @@ class FilterBox extends PureComponent {
           编辑
         </Button>
         <CategoryFilter
-          master={this.props.master}
+          viewer={this.props.viewer}
           dicCode={"Category"}
           fieldName="categories"
           doSearch={doSearch}
           title="类别："
         />
         <EducationFilter
-          master={this.props.master}
+          viewer={this.props.viewer}
           dicCode={"Education"}
           fieldName="education"
           doSearch={doSearch}
@@ -53,7 +53,7 @@ class FilterBox extends PureComponent {
           multiselect={false}
         />
         <JobFilter
-          master={this.props.master}
+          viewer={this.props.viewer}
           dicCode={"Job"}
           fieldName="jobs"
           doSearch={doSearch}
@@ -64,7 +64,7 @@ class FilterBox extends PureComponent {
             <span>出生地点：</span>
           </Col>
           <Col span={22}>
-            <BirthPlace master={this.props.master} doSearch={doSearch} />
+            <BirthPlace viewer={this.props.viewer} doSearch={doSearch} />
           </Col>
         </Row>
         <Row>
@@ -72,7 +72,7 @@ class FilterBox extends PureComponent {
             <span>更多：</span>
           </Col>
           <Col span={22}>
-            <MoreFilter master={this.props.master} doSearch={doSearch} />
+            <MoreFilter viewer={this.props.viewer} doSearch={doSearch} />
           </Col>
         </Row>
       </section>
@@ -86,13 +86,13 @@ FilterBox.propTypes = {
 
 module.exports = Relay.createContainer(withRouter(FilterBox), {
   fragments: {
-    master: () => Relay.QL`
-      fragment on MasterType {
-        ${BirthPlace.getFragment("master")}
-        ${EducationFilter.getFragment("master")}
-        ${CategoryFilter.getFragment("master")}
-        ${JobFilter.getFragment("master")}
-        ${MoreFilter.getFragment("master")}
+    viewer: () => Relay.QL`
+      fragment on User {
+        ${BirthPlace.getFragment("viewer")}
+        ${EducationFilter.getFragment("viewer")}
+        ${CategoryFilter.getFragment("viewer")}
+        ${JobFilter.getFragment("viewer")}
+        ${MoreFilter.getFragment("viewer")}
       }
     `
   }

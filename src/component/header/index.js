@@ -59,7 +59,7 @@ class AppHeader extends React.PureComponent {
             </Button>
           </div>
           <div>
-            <Masterinfo master={this.props.master} />
+            <Masterinfo viewer={this.props.viewer} />
           </div>
         </div>
       </Header>

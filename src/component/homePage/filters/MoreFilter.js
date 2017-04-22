@@ -38,21 +38,21 @@ class MoreFilter extends PureComponent {
     return (
       <InputGroup compact>
         <DatePicker
-          master={this.props.master}
+          viewer={this.props.viewer}
           style={{ marginRight: -1, marginTop: 1 }}
           format="YYYY-MM-DD"
           placeholder="录入时间"
           onChange={this.onDateChangeHandler("createOn")}
         />
         <Gender
-          master={this.props.master}
+          viewer={this.props.viewer}
           dicCode={"Gender"}
           doSearch={doSearch}
           fieldName={"gender"}
           title="性别"
         />
         <Marriage
-          master={this.props.master}
+          viewer={this.props.viewer}
           dicCode={"Marriage"}
           doSearch={doSearch}
           fieldName={"marriage"}
@@ -75,10 +75,10 @@ MoreFilter.propTypes = {
 
 module.exports = Relay.createContainer(MoreFilter, {
   fragments: {
-    master: () => Relay.QL`
-      fragment on MasterType {
-        ${Gender.getFragment("master")}
-        ${Marriage.getFragment("master")}
+    viewer: () => Relay.QL`
+      fragment on User {
+        ${Gender.getFragment("viewer")}
+        ${Marriage.getFragment("viewer")}
       }
     `
   }
