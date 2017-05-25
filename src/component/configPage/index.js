@@ -51,7 +51,7 @@ class ConfigPage extends React.PureComponent {
     message.success("success !", 2);
   };
   render() {
-    console.log(this.props);
+    // console.log(this.props);
     const {
       viewer: { categories, educations, jobs, genders, marriages }
     } = this.props;

@@ -5,7 +5,7 @@ const SubFatQuery = Relay.QL`
     fragment on ArticleMutationPayload {
         subNotes,
         article {
-            notes {
+            notes(first: 10) {
               edges
             }
         }
@@ -15,7 +15,7 @@ const AddFatQuery = Relay.QL`
     fragment on ArticleMutationPayload {
         newNotes,
         article {
-            notes {
+            notes(first: 10) {
               edges
             }
         }

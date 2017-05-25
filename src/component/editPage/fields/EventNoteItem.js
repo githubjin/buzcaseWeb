@@ -18,10 +18,10 @@ module.exports = (props: any) => {
     placeholder,
     message,
     onKeyUp,
-    getFieldValue,
+    // getFieldValue,
     defaultValue = ""
   } = props;
-  var isvisible = !_.isEmpty(getFieldValue(`${prefix}${k}`));
+  // var isvisible = !_.isEmpty(getFieldValue(`${prefix}${k}`));
   // onBlur={onblur(k)}
   return (
     <FormItem
@@ -50,29 +50,19 @@ module.exports = (props: any) => {
             style={{ marginRight: 8 }}
           />
         )}
-        {isvisible &&
-          <Popconfirm
-            title="你确定要删除该条记录吗？"
-            onConfirm={() => remove(k)}
-            okText="确定"
-            cancelText="取消"
-          >
-            <Icon
-              style={{ fontSize: 20, cursor: "pointer" }}
-              className="dynamic-delete-button"
-              type="minus-circle-o"
-              disabled={length === 1}
-            />
-          </Popconfirm>}
-        {!isvisible &&
+        <Popconfirm
+          title="你确定要删除该条记录吗？"
+          onConfirm={() => remove(k)}
+          okText="确定"
+          cancelText="取消"
+        >
           <Icon
             style={{ fontSize: 20, cursor: "pointer" }}
             className="dynamic-delete-button"
             type="minus-circle-o"
-            onClick={() => remove(k)}
             disabled={length === 1}
-          />}
-
+          />
+        </Popconfirm>
       </div>
     </FormItem>
   );

@@ -5,9 +5,9 @@ const FormItem = Form.Item;
 
 class SignUpPanel extends PureComponent {
   state: { confirmDirty: boolean };
-  handleSubmit: (any) => any;
-  checkPassword: (any) => any;
-  handleConfirmBlur: (any) => any;
+  handleSubmit: any => any;
+  checkPassword: any => any;
+  handleConfirmBlur: any => any;
   constructor(props) {
     super(props);
     this.state = {
@@ -21,7 +21,7 @@ class SignUpPanel extends PureComponent {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        console.log("Received values of form: ", values);
+        // console.log("Received values of form: ", values);
         this.props.handleSubmit(values, true);
       }
     });

@@ -1,19 +1,38 @@
 // @flow
-import React, { Component, PropTypes } from "react";
+import React, { PureComponent, PropTypes } from "react";
 import Relay from "react-relay";
 import { Spin } from "antd";
 import { currentRelay } from "../util";
 
-export default class RelayLoading extends Component {
+const styles = {
+  loadingStyle: {
+    width: "100%",
+    textAlign: "center"
+  }
+};
+export default class RelayLoading extends PureComponent {
   // constructor(props: any) {
   //   super(props);
   // }
   renderChild(child: any, props: Object) {
     return React.cloneElement(child, { ...this.props, ...props });
   }
+  shouldComponentUpdate(nextProps: any, nextState: any, nextContext: any) {
+    let { shouldUpdate = true } = nextProps;
+    // console.log(
+    //   "RelayLoading-shouldComponentUpdate-shouldUpdate : ",
+    //   shouldUpdate
+    // );
+    return shouldUpdate;
+  }
   render() {
     const child = React.Children.only(this.props.children);
-    const { route, loadingElement = Spin, forceFetch = false } = this.props;
+    const {
+      route,
+      loadingElement = Spin,
+      forceFetch = false,
+      loadingStyle = styles.loadingStyle
+    } = this.props;
     const routeConfig = route;
     return (
       <Relay.Renderer
@@ -27,7 +46,11 @@ export default class RelayLoading extends Component {
           } else if (props) {
             return this.renderChild(child, props);
           } else {
-            return <div>{React.createElement(loadingElement)}</div>;
+            return (
+              <div style={loadingStyle}>
+                {React.createElement(loadingElement)}
+              </div>
+            );
           }
         }}
       />

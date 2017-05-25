@@ -10,6 +10,24 @@ import RelayLoading from "../RelayLoading";
 import NodeQueryConfig from "../../queryConfig/NodeQueryConfig";
 import { DetailContainer } from "../ArticleDetail";
 import NoteForm from "./NoteForm";
+import styled from "styled-components";
+
+const Empty = styled.div`
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+`;
+const EmptyTitle = styled.p`
+    margin-top: 20px;
+    font-size: 15px;
+    font-weight: 500;
+`;
+const EmptyBack = styled.p`
+    font-size: 15px;
+    margin-top: 20px;
+`;
 
 const styles = {
   icon: {
@@ -66,7 +84,10 @@ class DetailPage extends Component {
     };
   };
   render() {
-    // console.log(this.props.node);
+    // console.log("------------------id--------------", 9090);
+    if (!this.props.node) {
+      return <EmptyDetail />;
+    }
     const { node: { id } } = this.props;
     return (
       <div>
@@ -78,12 +99,9 @@ class DetailPage extends Component {
               <a onClick={this.back} className="meta-item">
                 <Icon style={styles.icon} type="rollback" />返回
               </a>
-              <Link to={`/edit/${id}`} className="meta-item">
+              <Link to={`/edit/${id}/${Math.random()}`} className="meta-item">
                 <Icon style={styles.icon} type="edit" />编辑
               </Link>
-              <a className="meta-item">
-                <Icon style={styles.icon} type="delete" />删除
-              </a>
             </div>
           }
         />
@@ -112,11 +130,27 @@ class DetailPage extends Component {
   }
 }
 
+class EmptyDetail extends React.PureComponent {
+  render() {
+    return (
+      <Empty>
+        <EmptyTitle>该案例已经不存在</EmptyTitle>
+        <EmptyBack><Link to="/">返回首页</Link></EmptyBack>
+      </Empty>
+    );
+  }
+}
+
 const Container = Relay.createContainer(withRouter(DetailPage), {
+  initialVariables: {
+    width: window.innerWidth > 800 ? 800 : window.innerWidth
+  },
   fragments: {
     node: () => Relay.QL`
         fragment on Article {
           id,
+          attachments_h300,
+          attachments_maxw(width: $width),
           ${NoteMutation.getFragment("node")}
           ${DetailContainer.getFragment("node")}
         }
@@ -126,7 +160,10 @@ const Container = Relay.createContainer(withRouter(DetailPage), {
 
 class DetailPageContainer extends Component {
   render() {
-    const { match: { params: { id } } } = this.props;
+    let { match: { params: { id } } } = this.props;
+    if (!id) {
+      id = this.props.id;
+    }
     return (
       <RelayLoading route={new NodeQueryConfig({ id })}>
         <Container />

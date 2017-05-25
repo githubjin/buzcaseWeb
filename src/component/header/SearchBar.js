@@ -1,7 +1,7 @@
 // @flow
 
 import React from "react";
-import { Input, Tag } from "antd";
+import { Input } from "antd";
 const Search = Input.Search;
 import { Link } from "react-router-dom";
 import Relay from "react-relay";
@@ -10,6 +10,7 @@ import RelayLoading from "../RelayLoading";
 import styled from "styled-components";
 import _ from "lodash";
 import moment from "moment";
+// import "moment/locale/zh-cn";
 const Background = styled.div`
   width: 100%;
   height: 100%;
@@ -108,11 +109,20 @@ class Complete extends React.PureComponent {
         <ResultTitle>{title}</ResultTitle>
         {items.map(item => (
           <ResultItem key={item.article}>
-            <Tag style={{ fontSize: 14 }}>
-              <Link to={`/detail/${item.article}`}>
-                {this.renderHightLight(item[field])}
+            <span
+              style={{
+                fontSize: 14,
+                maxWidth: 480
+              }}
+            >
+              <Link
+                className="ant-tag-text"
+                to={`/detail/${item.article}/${Math.random()}`}
+                style={{ color: "#9b9b9b" }}
+              >
+                {this.renderHightLight(item["highlight"])}
               </Link>
-            </Tag>
+            </span>
             <Timer>
               {moment(item.createdAt, "YYYY-MM-DD hh:mm").fromNow()}
             </Timer>
@@ -140,9 +150,10 @@ class Complete extends React.PureComponent {
   // }
   render() {
     // console.log("e.keyCode is ", e.keyCode, e.target.value);
-    const {
-      viewer: { autocomplete: { names = [], titles = [] } = {} }
-    } = this.props;
+    const viewer = this.props.viewer || {};
+    const autocomplete = viewer.autocomplete || {};
+    const names = autocomplete.names || [];
+    const titles = autocomplete.titles || [];
     // console.log(this.props.viewer);
     const isVisible =
       this.state.isVisible && (names.length > 0 || titles.length > 0);
@@ -210,7 +221,11 @@ const Container = Relay.createContainer(Complete, {
 
 export default (props: any) => {
   return (
-    <RelayLoading route={new MasterQueryConfig()} forceFetch={true}>
+    <RelayLoading
+      route={new MasterQueryConfig()}
+      forceFetch={true}
+      loadingStyle={{}}
+    >
       <Container />
     </RelayLoading>
   );

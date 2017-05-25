@@ -3,6 +3,7 @@ import React from "react";
 import { Form, DatePicker } from "antd";
 const FormItem = Form.Item;
 import moment from "moment";
+// import "moment/locale/zh-cn";
 
 module.exports = (props: any) => {
   const {

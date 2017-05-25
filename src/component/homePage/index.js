@@ -57,6 +57,8 @@ class HomePage extends React.PureComponent {
     // console.log(response);
     let { ArticleDeleteMutation: { error } = {} } = response;
     if (!error) {
+      const { forceFetch, variables } = this.props.relay;
+      forceFetch(variables);
       message.success("案例已删除", 2);
     } else {
       message.error("案例未删除成功！", 2);
@@ -64,10 +66,12 @@ class HomePage extends React.PureComponent {
   };
   deleteArticle = (id: string): any => {
     return () => {
-      Relay.Store.commitUpdate(
+      // console.log("this.props", this.props);
+      this.props.relay.commitUpdate(
         new DelMutation({
           articleId: id,
           viewer: this.props.viewer
+          // userId: this.props.viewer.id
         }),
         {
           onFailure: this.onFailure,
@@ -115,7 +119,9 @@ const Container = Relay.createContainer(HomePage, {
     page: 1,
     pageSize: 10,
     sorters: [{ order: "createdAt", dir: "DESC" }],
-    conditions: {}
+    conditions: {},
+    width: window.innerWidth > 800 ? 800 : window.innerWidth,
+    eventFirst: 1
   },
   fragments: {
     viewer: () => Relay.QL`
@@ -132,7 +138,7 @@ const Container = Relay.createContainer(HomePage, {
           edges {
             node{
               id,
-              attachments,
+              attachments_inline,
               submit,
               title,
               categories,
@@ -148,7 +154,7 @@ const Container = Relay.createContainer(HomePage, {
               jobs,
               marriage,
               children,
-              events {
+              events(first: $eventFirst) {
                 edges {
                   node {
                     id,
@@ -158,15 +164,6 @@ const Container = Relay.createContainer(HomePage, {
                 }
               },
               knowledge,
-              notes {
-                edges {
-                  node {
-                    id,
-                    text,
-                    createdAt,
-                  }
-                }
-              },
               createdAt
             }
           }

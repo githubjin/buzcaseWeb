@@ -13,15 +13,22 @@ import {
   Switch,
   Redirect
 } from "react-router-dom";
+import PrivateRoute from "./routes/PrivateRoute";
+import SignPage from "./component/sign";
+
 import HomePage from "./component/homePage";
 import Masterinfo from "./component/header/Masterinfo";
 import AddPage from "./component/editPage";
 import ConfigPage from "./component/configPage";
 import Feedback from "./component/feedback";
 import DetailPage from "./component/detailPage";
-import SignPage from "./component/sign";
 import DraftsPage from "./component/drafts";
-import PrivateRoute from "./routes/PrivateRoute";
+
+// import asyncComponent from "./component/asyncComponent";
+// const Feedback = asyncComponent(
+//   () => System.import("./component/feedback").then(module => module.default),
+//   { name: "Feedback" }
+// );
 
 class App extends PureComponent {
   render() {
@@ -47,7 +54,10 @@ class App extends PureComponent {
                 >
                   <div className="App-content">
                     <PrivateRoute exact path="/" component={HomePage} />
-                    <PrivateRoute path="/edit/:id" component={AddPage} />
+                    <PrivateRoute
+                      path="/edit/:id/:random"
+                      component={AddPage}
+                    />
                     <PrivateRoute path="/feedback" component={Feedback} />
                     <PrivateRoute path="/detail/:id" component={DetailPage} />
                     <PrivateRoute path="/config" component={ConfigPage} />
@@ -89,7 +99,6 @@ module.exports = Relay.createContainer(App, {
     viewer: () => Relay.QL`
       fragment on User {
         ${Masterinfo.getFragment("viewer")}
-        ${SignPage.getFragment("viewer")}
       }
     `
   }

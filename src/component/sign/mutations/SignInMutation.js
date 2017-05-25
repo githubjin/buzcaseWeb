@@ -39,18 +39,25 @@ export default class SignInMutation extends Relay.Mutation {
     };
   }
   getConfigs() {
-    console.log(this.props);
+    // console.log(this.props);
     return [
-      {
-        type: "FIELDS_CHANGE",
-        fieldIDs: { viewer: this.props.viewer.id }
-      },
+      // {
+      //   type: "FIELDS_CHANGE",
+      //   fieldIDs: { viewer: this.props.viewer.id }
+      // },
       {
         type: "REQUIRED_CHILDREN",
         children: [
           Relay.QL`
           fragment on SignInPayload {
-            error
+            error,
+             viewer {
+                id,
+                username,
+                email,
+                sessionToken,
+                emailVerified
+            }
           }`
         ]
       }

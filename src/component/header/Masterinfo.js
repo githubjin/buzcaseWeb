@@ -30,12 +30,12 @@ class Masterinfo extends React.PureComponent {
     }
   }
   componentDidMount() {
-    if (_.isEmpty(this.props.viewer.username)) {
+    if (_.isEmpty(this.props.viewer) || _.isEmpty(this.props.viewer.username)) {
       this.getUserInfoFromLocal();
     }
   }
   getMaster() {
-    if (_.isEmpty(this.props.viewer.username)) {
+    if (_.isEmpty(this.props.viewer) || _.isEmpty(this.props.viewer.username)) {
       return this.state.viewer;
     }
     return this.props.viewer;
@@ -79,6 +79,7 @@ module.exports = Relay.createContainer(withRouter(Masterinfo), {
       fragment on User {
         id,
         username,
+        email,
         sessionToken,
         emailVerified
       }

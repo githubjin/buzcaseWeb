@@ -4,15 +4,15 @@ import { DatePicker, Input } from "antd";
 import Relay from "react-relay";
 const InputGroup = Input.Group;
 import moment from "moment";
+// import "moment/locale/zh-cn";
 
 import Marriage from "../filters/Marriage";
 import Gender from "../filters/Gender";
 
 class MoreFilter extends PureComponent {
-  onDateChangeHandler: (fieldName: string) => (
-    date: any,
-    dateString: string
-  ) => void;
+  onDateChangeHandler: (
+    fieldName: string
+  ) => (date: any, dateString: string) => void;
   constructor(props: any) {
     super(props);
     this.onDateChangeHandler = this.onDateChangeHandler.bind(this);

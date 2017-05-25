@@ -31,7 +31,10 @@ export default class DictDropdown extends PureComponent {
     this.setState({ text: e.item.props.children });
   }
   renderOverlay() {
-    const { viewer: { dic: { edges } } } = this.props;
+    // const { viewer: { dic: { edges } } } = this.props;
+    const viewer = this.props.viewer || {};
+    const dic = viewer.dic || {};
+    const edges = dic.edges || [];
     return (
       <Menu onClick={this.handleMenuClick}>
         {edges.map(edge => {

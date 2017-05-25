@@ -11,7 +11,7 @@ import SignUpMutation from "./mutations/SignUpMutation";
 import SignInMutation from "./mutations/SignInMutation";
 import alertError from "../alertError";
 import { setToken } from "../../initRelayNetworkLayer";
-import { withRouter } from "react-router-dom";
+// import { withRouter } from "react-router-dom";
 
 const Wraper = styled.div`
       display: flex;
@@ -31,15 +31,15 @@ const FormWraper = styled.div`
       min-height: 350px;
     `;
 
-class SignPage extends PureComponent {
+export default class SignPage extends PureComponent {
   state: { current: string };
-  constructor(props) {
+  constructor(props: any) {
     super(props);
     this.state = {
       current: "/signup"
     };
   }
-  onSuccess(res) {
+  onSuccess(res: Object) {
     var sign = res.signUp || res.signIn;
     var { error, viewer } = sign;
     if (!error) {
@@ -51,21 +51,17 @@ class SignPage extends PureComponent {
       alertError(error);
     }
   }
-  onFailure(transaction) {
+  onFailure(transaction: Object) {
     alertError(transaction.getError());
   }
-  handleSubmit(values, isSignUp) {
+  handleSubmit(values: any, isSignUp: boolean) {
     var _Mutation = isSignUp ? SignUpMutation : SignInMutation;
-    Relay.Store.commitUpdate(
-      new _Mutation({ ...values, viewer: this.props.viewer }),
-      {
-        onFailure: this.onFailure.bind(this),
-        onSuccess: this.onSuccess.bind(this)
-      }
-    );
+    Relay.Store.commitUpdate(new _Mutation({ ...values }), {
+      onFailure: this.onFailure.bind(this),
+      onSuccess: this.onSuccess.bind(this)
+    });
   }
   render() {
-    console.log(this.props.viewer);
     const { pathname } = this.props.location;
     return (
       <Wraper id="signtab">
@@ -90,7 +86,6 @@ class SignPage extends PureComponent {
               <SignUpPanel
                 handleSubmit={this.handleSubmit.bind(this)}
                 {...props}
-                viewer={this.props.viewer}
               />
             )}
           />
@@ -100,7 +95,6 @@ class SignPage extends PureComponent {
               <SignInPanel
                 handleSubmit={this.handleSubmit.bind(this)}
                 {...props}
-                viewer={this.props.viewer}
               />
             )}
           />
@@ -110,13 +104,13 @@ class SignPage extends PureComponent {
   }
 }
 
-module.exports = Relay.createContainer(withRouter(SignPage), {
-  fragments: {
-    viewer: () => Relay.QL`
-      fragment on User {
-        id
-        ${SignUpMutation.getFragment("viewer")}
-      }
-    `
-  }
-});
+// module.exports = Relay.createContainer(withRouter(SignPage), {
+//   fragments: {
+//     viewer: () => Relay.QL`
+//       fragment on User {
+//         id
+//         ${SignUpMutation.getFragment("viewer")}
+//       }
+//     `
+//   }
+// });

@@ -30,17 +30,22 @@ export default class FilteredList extends PureComponent {
       affixed: false
     };
   }
-  changeHandler(page, pageSize) {
+  changeHandler(page: number, pageSize: number) {
     // console.log(page, pageSize);
     this.props.goPage(page, pageSize);
   }
-  onAffixChange(affixed) {
+  onAffixChange(affixed: boolean) {
     this.setState({
       affixed: affixed
     });
   }
   render() {
-    const { viewer: { articles: { totalInfo, edges } } } = this.props;
+    // const { viewer: { articles: { totalInfo, edges } } } = this.props;
+    const viewer = this.props.viewer || {};
+    const articles = viewer.articles || {};
+    const totalInfo = articles.totalInfo || {};
+    const edges = articles.edges || [];
+
     const { affixed } = this.state;
     return (
       <section className="filter-list">

@@ -41,16 +41,23 @@ export default class SignUpMutation extends Relay.Mutation {
   }
   getConfigs() {
     return [
-      {
-        type: "FIELDS_CHANGE",
-        fieldIDs: { viewer: this.props.viewer.id }
-      },
+      // {
+      //   type: "FIELDS_CHANGE",
+      //   fieldIDs: { viewer: this.props.viewer.id }
+      // },
       {
         type: "REQUIRED_CHILDREN",
         children: [
           Relay.QL`
           fragment on SignUpPayload {
-            error
+            error,
+            viewer {
+                id,
+                username,
+                email,
+                sessionToken,
+                emailVerified
+            }
           }`
         ]
       }

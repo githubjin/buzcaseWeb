@@ -46,6 +46,7 @@ export default class ArticleDeleteMutation extends Relay.Mutation {
         type: "RANGE_DELETE",
         parentName: "viewer",
         parentID: this.props.viewer.id,
+        // parentID: this.props.userId,
         connectionName: "articles",
         deletedIDFieldName: "distroyedId",
         pathToConnection: ["viewer", "articles"]

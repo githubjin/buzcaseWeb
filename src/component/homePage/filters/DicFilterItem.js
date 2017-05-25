@@ -90,7 +90,11 @@ export default class DicFilterItem extends PureComponent {
     }
   }
   render() {
-    const { viewer: { dic: dict }, title } = this.props;
+    // const { viewer: { dic: dict }, title } = this.props;
+    const viewer = this.props.viewer || {};
+    const dict = viewer.dic || {};
+    const edges = dict.edges || [];
+    const title = this.props.title;
     // console.log("--------------------------", this.props);
     return (
       <Row>
@@ -99,7 +103,7 @@ export default class DicFilterItem extends PureComponent {
         </Col>
         <Col span={22}>
           <Row>
-            {dict.edges.map((edge, index) => (
+            {edges.map((edge, index) => (
               <Col span={2} key={edge.node.id}>
                 {this.renderItem(edge.node, index)}
               </Col>

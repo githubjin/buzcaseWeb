@@ -76,7 +76,10 @@ export default class BirthPlace extends React.PureComponent {
     }
   };
   provinceFormat() {
-    const { viewer: { provinces: { edges } } } = this.props;
+    // const { viewer: { provinces: { edges } } } = this.props;
+    const viewer = this.props.viewer || {};
+    const _provinces = viewer.provinces || {};
+    const edges = _provinces.edges || [];
     // console.log(cities, areas, "00120-0-120120-120-20-12001-20-21210-");
     let provinces = edges.map(edge => ({
       value: edge.node.name,
@@ -97,7 +100,7 @@ export default class BirthPlace extends React.PureComponent {
       label: item.name,
       isLeaf: item.isLeaf,
       code: item.code,
-      children: isCity ? this.subArea(false) : []
+      children: isCity ? this.subArea(false) : null
     }));
   }
   clearSubQuyu(value: any, selectedOptions: any) {

@@ -2,6 +2,7 @@
 
 import React from "react";
 import moment from "moment";
+// import "moment/locale/zh-cn";
 import { Link } from "react-router-dom";
 import SectionTitle from "../SectionTitle";
 import Relay from "react-relay";
@@ -118,7 +119,7 @@ class Drafts extends React.PureComponent {
             <Row key={edge.node.id} style={styles.draftBbox}>
               <Col span={24}>
                 <Title>
-                  <Link to={`/edit/${edge.node.id}`}>
+                  <Link to={`/edit/${edge.node.id}/${Math.random()}`}>
                     {edge.node.name || "无姓名"}
                     <Dot>●</Dot>
                     {edge.node.title || "无标题"}
@@ -158,7 +159,11 @@ var DraftsContainer = Relay.createContainer(Drafts, {
     page: 1,
     pageSize: 50,
     sorters: [{ order: "createdAt", dir: "DESC" }],
-    conditions: { submit: false }
+    conditions: { submit: false },
+    width: 78,
+    height: 78,
+    m: "m_pad",
+    maxWidth: window.innerWidth > 800 ? 800 : window.innerWidth
   },
   fragments: {
     viewer: () => Relay.QL`
@@ -186,15 +191,9 @@ var DraftsContainer = Relay.createContainer(Drafts, {
                 area
               },
               jobs,
-              events {
-                edges {
-                  node {
-                    id,
-                    text,
-                    createdAt,
-                  }
-                }
-              },
+              attachments,
+              larges:attachments_maxw(width: $maxWidth),
+              thumbs:attachments_wh(width: $width, height: $height, m: $m),
               marriage,
               children,
               knowledge,

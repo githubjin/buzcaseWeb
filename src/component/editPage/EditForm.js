@@ -40,7 +40,12 @@ class EditForm extends React.Component {
     form: Object,
     onEventInputDelete: (id: number) => void,
     onEventInputBlur: (id: number) => any,
-    handleSubmit: (values: Object, node: Object) => void
+    handleSubmit: (values: Object, node: Object) => void,
+    sendBackImages: (
+      attachments: string[],
+      larges: string[],
+      thumbs: string[]
+    ) => void
   };
   uuid: number;
   handleSubmit: (e: Object) => void;
@@ -55,20 +60,19 @@ class EditForm extends React.Component {
     this.remove = this.remove.bind(this);
     this.add = this.add.bind(this);
   }
-  // componentDidMount() {
-  //   this.timerID = setInterval(() => {
-  //     // console.log("timer is running");
-  //     this.props.form.setFieldsValue({
-  //       timer: Math.random()
-  //     });
-  //   }, 5000);
-  // }
+  componentDidMount() {
+    if (!this.props.node) {
+      return;
+    }
+    const { node: { larges, thumbs, attachments } = {} } = this.props;
+    this.props.sendBackImages(attachments, larges, thumbs);
+  }
   // componentWillUnmount() {
   //   // console.log("timer is removed");
   //   clearInterval(this.timerID);
   // }
   onKeyUp = e => {
-    console.log(e.keyCode);
+    // console.log(e.keyCode);
     if (e.keyCode === 32) {
       this.props.form.setFieldsValue({
         timer: Math.random()
@@ -82,7 +86,7 @@ class EditForm extends React.Component {
         // console.log("Received values of form: ", values);
         this.props.handleSubmit(values, this.props.node);
       } else {
-        console.log(err);
+        // console.log(err);
       }
     });
   }
@@ -361,11 +365,19 @@ export class WrappedEditForm extends React.PureComponent {
 }
 
 export default Relay.createContainer(WrappedEditForm, {
+  initialVariables: {
+    width: 78,
+    height: 78,
+    m: "m_pad",
+    maxWidth: window.innerWidth > 800 ? 800 : window.innerWidth
+  },
   fragments: {
     node: () => Relay.QL`
         fragment on Article {
           id,
           attachments,
+          larges:attachments_maxw(width: $maxWidth),
+          thumbs:attachments_wh(width: $width, height: $height, m: $m),
           title,
           categories,
           name,
@@ -380,7 +392,7 @@ export default Relay.createContainer(WrappedEditForm, {
           jobs,
           marriage,
           children,
-          events {
+          events(first: 10) {
             edges {
               node {
                 id,
@@ -390,7 +402,7 @@ export default Relay.createContainer(WrappedEditForm, {
             }
           },
           knowledge,
-          notes {
+          notes(first: 10) {
             edges {
               node {
                 id,

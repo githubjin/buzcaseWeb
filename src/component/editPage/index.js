@@ -36,6 +36,11 @@ class AritcleEditor extends PureComponent {
   mutating: boolean;
   submiting: boolean;
   tasks: Array<Task>;
+  state: {
+    attachments: string[],
+    larges: string[],
+    thumbs: string[]
+  };
   constructor(props) {
     super(props);
     // article fields array
@@ -57,18 +62,29 @@ class AritcleEditor extends PureComponent {
     this.submiting = false;
     // 提交任务队列，线性执行
     this.tasks = [];
+    this.state = {
+      attachments: [],
+      larges: [],
+      thumbs: []
+    };
   }
   consoleState = () => {
-    console.log("this.tasks", this.tasks, this.tasks.length);
-    console.log("this.submiting", this.submiting);
-    console.log("this.savedEvents", this.savedEvents, this.savedEvents.length);
-    console.log("this.keyArray", this.keyArray, this.keyArray.length);
-    console.log("this.currentKey", this.currentKey);
-    console.log("this.allEvents", this.allEvents);
-    console.log("this.articleValues", this.articleValues);
+    // console.log("this.tasks", this.tasks, this.tasks.length);
+    // console.log("this.submiting", this.submiting);
+    // console.log("this.savedEvents", this.savedEvents, this.savedEvents.length);
+    // console.log("this.keyArray", this.keyArray, this.keyArray.length);
+    // console.log("this.currentKey", this.currentKey);
+    // console.log("this.allEvents", this.allEvents);
+    // console.log("this.articleValues", this.articleValues);
   };
   componentWillReceiveProps(nextProps) {
-    if (nextProps.match.params.id !== this.props.match.params.id) {
+    // console.log("nextProps.match.params", nextProps.match.params);
+    // console.log("this.props.match.params", this.props.match.params);
+    if (
+      nextProps.match.params.id !== this.props.match.params.id ||
+      nextProps.match.params.random !== this.props.match.params.random
+    ) {
+      this._initUploadedImages([], [], []);
       this.keyArray = [];
       this.currentKey = "";
       this.articleValues = {};
@@ -121,6 +137,7 @@ class AritcleEditor extends PureComponent {
     force: boolean = false
   ): any => {
     return e => {
+      // console.log(eventKey, force, e);
       if (e.keyCode !== 32) {
         return;
       }
@@ -162,7 +179,10 @@ class AritcleEditor extends PureComponent {
     // console.log(
     //   this.currentKey,
     //   "--------------- onValuesChange -----------------",
-    //   JSON.stringify(values)
+    //   JSON.stringify(values),
+    //   props,
+    //   articleNode,
+    //   force
     // );
     if (!_.isEmpty(articleNode)) {
       this.article = articleNode;
@@ -174,6 +194,14 @@ class AritcleEditor extends PureComponent {
     if (this.idArticleEvent(keys[0])) {
       this.allEvents = { ...this.allEvents, ...values };
     }
+    // console.log(
+    //   `!_.isEmpty(this.currentKey) &&
+    //   this.currentKey !== keys[0] &&
+    //   this.isPureAritleField(this.currentKey)`,
+    //   !_.isEmpty(this.currentKey),
+    //   this.currentKey !== keys[0],
+    //   this.isPureAritleField(this.currentKey)
+    // );
     if (
       !_.isEmpty(this.currentKey) &&
       this.currentKey !== keys[0] &&
@@ -369,9 +397,12 @@ class AritcleEditor extends PureComponent {
     articleNode: Object,
     force: boolean = false
   ) => {
-    this.tasks.push({ func: this.handleSubmit, args: [values, articleNode] });
-    if (this.tasks.length > 1 && !force) {
-      return;
+    // this.tasks.push({ func: this.handleSubmit, args: [values, articleNode] });
+    // if (this.tasks.length > 1 && !force) {
+    //   return;
+    // }
+    if (this.tasks && this.tasks.length > 0) {
+      this.tasks = [];
     }
     // id,keys,values,subEvents,subNotes,addEvents,addNotes,noteIds,noteValues,eventIds,eventValues,submit,
     var inputObject: Object = { id: this.id, submit: true };
@@ -455,9 +486,49 @@ class AritcleEditor extends PureComponent {
       "homePlace"
     ];
   };
+  _initUploadedImages = (
+    attachments: string[],
+    larges: string[] = [],
+    thumbs: string[] = []
+  ): void => {
+    this.setState({
+      attachments,
+      larges,
+      thumbs
+    });
+  };
+  shouldComponentUpdate(nextProps, nextState) {
+    return (
+      this.props.match.params.id !== nextProps.match.params.id ||
+      this.props.match.params.random !== nextProps.match.params.random ||
+      this.state.attachments !== nextState.attachments ||
+      this.state.larges !== nextState.larges ||
+      this.state.thumbs !== nextState.thumbs
+    );
+  }
+  imageCommit = (
+    input: Object,
+    doSubmit = false,
+    callback: (error: any, response: Object) => void
+  ): void => {
+    if (this.id && this.id !== " new") {
+      input.id = this.id;
+    } else if (input.id && input.id !== "new") {
+      this.id = input.id;
+    }
+    this.props.relay.commitUpdate(new ArticleMutation({ input, doSubmit }), {
+      onFailure: callback,
+      onSuccess: response => {
+        if (response.saveArticle && (!this.id || this.id === "new")) {
+          this.id = response.saveArticle.article.id;
+        }
+        callback(null, response);
+      }
+    });
+  };
   render() {
     // console.log(this.props);
-    const { match: { params: { id } } } = this.props;
+    const { match: { params: { id, random } } } = this.props;
     return (
       <div>
         <SectionTitle
@@ -475,27 +546,41 @@ class AritcleEditor extends PureComponent {
         />
         <section className="filter-box">
           <RowX>
-            <ImageUpload />
+            <ImageUpload
+              id={id}
+              random={random}
+              imageCommit={this.imageCommit}
+              larges={this.state.larges}
+              thumbs={this.state.thumbs}
+              attachments={this.state.attachments}
+            />
           </RowX>
           {id === "new" &&
             <WrappedEditForm
+              random={random}
               handleSubmit={this.handleSubmit}
               onEventInputBlur={this.onEventInputBlur}
               onEventInputDelete={this.onEventInputDelete}
               viewer={this.props.viewer}
+              sendBackImages={this._initUploadedImages}
               onValuesChange={this.onValuesChange.bind(this)}
             />}
           {id !== "new" &&
-            <RelayLoading route={new NodeQueryConfig({ id })}>
+            <RelayLoading
+              shouldUpdate={false}
+              forceFetch={true}
+              route={new NodeQueryConfig({ id })}
+            >
               <EditFormContainer
+                random={random}
                 handleSubmit={this.handleSubmit}
                 onEventInputBlur={this.onEventInputBlur}
                 onEventInputDelete={this.onEventInputDelete}
                 viewer={this.props.viewer}
+                sendBackImages={this._initUploadedImages}
                 onValuesChange={this.onValuesChange.bind(this)}
               />
             </RelayLoading>}
-
         </section>
       </div>
     );

@@ -5,12 +5,15 @@ import { Row, Col, Icon, Popconfirm } from "antd";
 import { withRouter, Link } from "react-router-dom";
 import _ from "lodash";
 import moment from "moment";
-import "moment/locale/zh-cn";
+// import "moment/locale/zh-cn";
 moment.locale("zh-cn");
+import LazyLoad from "react-lazyload";
 // import styled from 'styled-components';
 
-import ArticleDetail from "../ArticleDetail";
+import { DetailContainer } from "../ArticleDetail";
 import type { ArticleProps } from "../types";
+import RelayLoading from "../RelayLoading";
+import NodeQueryConfig from "../../queryConfig/NodeQueryConfig";
 
 const styles = {
   wrap: {
@@ -76,13 +79,12 @@ class ArticleItem extends PureComponent {
       return null;
     }
     let first = attachments[0];
-    // http://lorempixel.com/640/480/cats
-    first = _.replace(first, "640", "200");
-    first = _.replace(first, "480", "112");
-    return first;
+    return _.startsWith(first, "https")
+      ? first
+      : first.replace("http", "https");
   }
   onChange(a, b, c) {
-    console.log(a, b, c);
+    // console.log(a, b, c);
   }
   viewDetails() {
     this.props.history.push(`/detail/${this.props.article.id}`);
@@ -99,7 +101,7 @@ class ArticleItem extends PureComponent {
     const {
       article: {
         id,
-        attachments,
+        attachments_inline: attachments,
         categories,
         title,
         name,
@@ -131,7 +133,7 @@ class ArticleItem extends PureComponent {
             <span>{moment(createdAt).fromNow()}</span>
           </Col>
           <Col span={2} style={styles.bnt}>
-            <Link to={`/edit/${id}`} className="meta-item">
+            <Link to={`/edit/${id}/${Math.random()}`} className="meta-item">
               <Icon type="edit" style={styles.rightTopIcon} />编辑
             </Link>
           </Col>
@@ -171,11 +173,13 @@ class ArticleItem extends PureComponent {
                 onClick={this.viewDetails}
                 style={{ paddingTop: 7 }}
               >
-                <img
-                  src={this.getInlineImage(attachments)}
-                  alt="命盘"
-                  style={styles.img}
-                />
+                <LazyLoad height={200} offset={100}>
+                  <img
+                    src={this.getInlineImage(attachments)}
+                    alt="命盘"
+                    style={styles.img}
+                  />
+                </LazyLoad>
               </Col>}
             <Col
               span={hasAttachments ? 19 : 24}
@@ -184,7 +188,7 @@ class ArticleItem extends PureComponent {
               {!_.isEmpty(events.edges) &&
                 <div onClick={this.viewDetails}>
                   <span style={styles.bold}>重要事件：</span>
-                  {_.truncate(events.edges[0].node.text, { length: 200 })}
+                  {_.truncate(events.edges[0].node.text, { length: 102 })}
                 </div>}
               <div>
                 <div onClick={this.viewDetails}>
@@ -192,21 +196,28 @@ class ArticleItem extends PureComponent {
                     命理知识备注：
                   </span>
                   <span>
-                    {_.truncate(knowledge, { length: 200 })}
+                    {_.truncate(knowledge, { length: 102 })}
                   </span>
                 </div>
-                <a onClick={this.showDetailHandler} className="toggle-expand">
-                  显示全部
-                </a>
               </div>
             </Col>
           </Row>}
+        {!showDetail &&
+          <Row>
+            <Col span={24}>
+              <a onClick={this.showDetailHandler} className="toggle-expand">
+                显示全部
+              </a>
+            </Col>
+          </Row>}
         {showDetail &&
-          <ArticleDetail
-            article={this.props.article}
-            affixHandler={this.hideDetail}
-            affix={true}
-          />}
+          <RelayLoading route={new NodeQueryConfig({ id })}>
+            <DetailContainer
+              id={id}
+              affixHandler={this.hideDetail}
+              affix={true}
+            />
+          </RelayLoading>}
       </div>
     );
   }

@@ -15,6 +15,7 @@ const FormItem = Form.Item;
 import _ from "lodash";
 import Relay from "react-relay";
 import moment from "moment";
+// import "moment/locale/zh-cn";
 
 import SectionTitle from "../SectionTitle";
 import AddFeedbackMutation from "./FeedbackMutation";

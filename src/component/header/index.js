@@ -52,7 +52,7 @@ class AppHeader extends React.PureComponent {
             <Button
               type="primary"
               size="large"
-              onClick={this.clickHandler("/edit/new")}
+              onClick={this.clickHandler(`/edit/new/${new Date().getTime()}`)}
               className="add-article-bnt"
             >
               录入新案例

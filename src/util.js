@@ -25,13 +25,13 @@ export let logout = (callback: () => {}) => {
     }
   })
     .then(function(data) {
-      console.log("request succeeded with JSON response", data);
+      // console.log("request succeeded with JSON response", data);
       window.localStorage.removeItem(buzcaseUserKey);
       currentRelay.reset();
       callback();
     })
     .catch(function(error) {
-      console.log("request failed", error);
+      // console.log("request failed", error);
     });
 };
 

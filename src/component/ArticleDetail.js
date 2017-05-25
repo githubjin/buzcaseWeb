@@ -15,6 +15,7 @@ import Slider from "react-slick";
 import _ from "lodash";
 import Relay from "react-relay";
 import moment from "moment";
+// import "moment/locale/zh-cn";
 
 import type { ArticleProps } from "./types";
 
@@ -29,7 +30,9 @@ const styles = {
     cursor: "pointer"
   },
   img: {
-    height: 300
+    height: 300,
+    margin: "0 auto",
+    maxWidth: 960
   },
   mengban: {
     width: "100%",
@@ -40,6 +43,14 @@ const styles = {
   },
   itemPadding: {
     paddingBottom: 10
+  },
+  itemInHome: {
+    borderTop: "1px solid rgba(221, 221, 221, 0.3)",
+    marginTop: 30,
+    paddingTop: 5
+  },
+  itemInPage: {
+    paddingTop: 1
   },
   empty: {
     width: "100%",
@@ -58,16 +69,15 @@ const styles = {
 };
 
 const settings = {
-  className: "slider variable-width",
-  infinite: true,
-  slidesToShow: 1,
-  slidesToScroll: 1,
-  variableWidth: true,
-  swipeToSlide: true,
   autoplay: true,
   draggable: false,
-  touchMove: true,
-  dots: false
+  touchMove: false,
+  dots: true,
+  dotsClass: "slick-dots slick-thumb",
+  infinite: true,
+  speed: 500,
+  slidesToShow: 1,
+  slidesToScroll: 1
 };
 
 export default class ArticleDetail extends Component {
@@ -106,7 +116,8 @@ export default class ArticleDetail extends Component {
   }
   handleCancel() {
     this.setState({
-      previewVisible: false
+      previewVisible: false,
+      previewImage: ""
     });
   }
   affixHandler() {
@@ -141,26 +152,26 @@ export default class ArticleDetail extends Component {
     }
   }
   getSliderImage(url: string): string {
-    let fin = url;
-    fin = _.replace(fin, "640", "400");
-    fin = _.replace(fin, "480", "300");
-    return fin;
+    return _.startsWith(url, "https") ? url : url.replace("http", "https");
   }
-  renderImages(attachments: string[]) {
+  renderImages(attachments: string[], attachments_maxw: string[]) {
     if (_.isEmpty(attachments)) {
       return null;
     }
+    // console.log("attachments : ", attachments.length, attachments);
     return (
       <Slider {...settings}>
         {attachments.map((item, i) => {
           return (
-            <div style={styles.imgWrap} key={`${item}_${i}`}>
+            <div
+              key={`img_detail_${i}`}
+              onClick={this.showPic(attachments_maxw[i])}
+            >
               <img
                 style={styles.img}
                 src={this.getSliderImage(item)}
                 alt="命盘"
               />
-              <div onClick={this.showPic(item)} style={styles.mengban} />
             </div>
           );
         })}
@@ -178,8 +189,16 @@ export default class ArticleDetail extends Component {
     const article = this.props.article || this.props.node;
     const { name, title, gender, homePlace, birthday, categories } = article;
     return (
-      <div>
-        <Row style={{ ...styles.itemPadding, ...{ paddingTop: 1 } }}>
+      <div style={{ marginTop: 30 }}>
+        <Row
+          style={{
+            ...styles.itemPadding,
+            ...{
+              borderTop: "1px solid rgba(221, 221, 221, 0.3)",
+              paddingTop: 5
+            }
+          }}
+        >
           <Col span={2}><strong>标题：</strong> </Col>
           <Col span={10}>{title}</Col>
           <Col span={2}><strong>类型：</strong> </Col>
@@ -210,12 +229,13 @@ export default class ArticleDetail extends Component {
     } = this.props;
     const article = this.props.article || this.props.node;
     const {
-      attachments,
+      attachments_h300: attachments,
+      attachments_maxw,
       education,
       jobs,
       marriage,
       children,
-      events,
+      _events: events,
       knowledge,
       notes
     } = article;
@@ -229,9 +249,14 @@ export default class ArticleDetail extends Component {
         }}
         style={{ marginTop: 10, fontSize: 14, lineHeight: 1.7, color: "#000" }}
       >
-        {this.renderImages(attachments)}
+        {this.renderImages(attachments, attachments_maxw)}
         {showAll && this.renderNameAndTitle()}
-        <Row style={{ ...styles.itemPadding, ...{ paddingTop: 1 } }}>
+        <Row
+          style={{
+            ...styles.itemPadding,
+            ...(showAll ? styles.itemInPage : styles.itemInHome)
+          }}
+        >
           <Col span={2}><strong>学历：</strong> </Col>
           <Col span={10}>{education}</Col>
           <Col span={2}><strong>职业：</strong> </Col>
@@ -350,12 +375,16 @@ export default class ArticleDetail extends Component {
         <Modal
           width="auto"
           closable={true}
-          style={{ top: 1, left: 1 }}
+          style={{ maxWidth: 830, textAlign: "center" }}
           visible={previewVisible}
           footer={null}
           onCancel={this.handleCancel}
         >
-          <img alt="example" style={{ width: "100%" }} src={previewImage} />
+          <img
+            alt="example"
+            style={{ width: "auto" }}
+            src={this.getSliderImage(previewImage)}
+          />
         </Modal>
       </div>
     );
@@ -369,11 +398,16 @@ ArticleDetail.propTypes = {
 };
 
 export const DetailContainer = Relay.createContainer(ArticleDetail, {
+  initialVariables: {
+    width: window.innerWidth > 800 ? 800 : window.innerWidth,
+    eventFirst: 10
+  },
   fragments: {
     node: () => Relay.QL`
         fragment on Article {
           id,
-          attachments,
+          attachments_h300,
+          attachments_maxw(width: $width),
           title,
           categories,
           name,
@@ -388,7 +422,7 @@ export const DetailContainer = Relay.createContainer(ArticleDetail, {
           jobs,
           marriage,
           children,
-          events {
+          _events:events(first: $eventFirst) {
             edges {
               node {
                 id,
@@ -398,7 +432,7 @@ export const DetailContainer = Relay.createContainer(ArticleDetail, {
             }
           },
           knowledge,
-          notes {
+          notes(first: 10) {
             edges {
               node {
                 id,
